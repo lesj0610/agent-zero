@@ -118,6 +118,8 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
     whisper_panel = _read("plugins/_whisper_stt/webui/main.html")
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
+    email_store = _read("plugins/_email_integration/webui/email-config-store.js")
+    email_config = _read("plugins/_email_integration/webui/config.html")
     welcome_store = _read("webui/components/welcome/welcome-store.js")
     discovery_store = _read("plugins/_discovery/webui/discovery-store.js")
     ko_js = _read("webui/js/i18n/locales/ko.js")
@@ -143,6 +145,15 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'x-text="$store.whisperStt.enabledText"' in whisper_panel
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
     assert "title: translateStaticText('Main')" in model_config_store
+    assert 'data-i18n-scope="settings"' in email_config
+    assert 'data-i18n-placeholder="email.placeholder.routing"' in email_config
+    assert 'data-i18n-placeholder="email.placeholder.reply"' in email_config
+    assert "localizeText(value = \"\")" in email_store
+    assert "label: tr(provider.label)" in email_store
+    assert "hint: tr(provider.hint)" in email_store
+    assert 'return tr("Use a Google App Password. A regular Gmail password usually will not work here.")' in email_store
+    assert 'return tr(result.message || (result.ok ? "Done." : "Something went wrong."))' in email_store
+    assert 'pieces.push(`${tr("Project")}: ${handler.project}`)' in email_store
     assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in welcome_store
     assert "localizeSystemResourceHtml(html)" in welcome_store
     assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in discovery_store
@@ -158,6 +169,12 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"System default": "시스템 기본값"' in ko_js
     assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
     assert '"Provider State": "제공자 상태"' in ko_js
+    assert '"Email Integration": "Email 통합"' in ko_js
+    assert '"Connect Agent Zero and your email account": "Agent Zero와 이메일 계정을 연결하세요"' in ko_js
+    assert '"Use a Google App Password. A regular Gmail password usually will not work here.":' in ko_js
+    assert '"Incoming mail server": "수신 메일 서버"' in ko_js
+    assert '"Check setup": "설정 확인"' in ko_js
+    assert '"email.placeholder.routing": "송장이나 청구 관련 질문은 항상 새 채팅을 시작하세요."' in ko_js
     assert '"Enabled": "활성화"' in ko_js
     assert '"Yes": "예"' in ko_js
     assert '"No": "아니요"' in ko_js

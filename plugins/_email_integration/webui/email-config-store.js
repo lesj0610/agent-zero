@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import * as API from "/js/api.js";
 
 const API_BASE = "/plugins/_email_integration";
@@ -107,6 +108,10 @@ const PROVIDER_OPTIONS = [
   },
 ];
 
+function tr(value = "") {
+  return translateStaticText(value);
+}
+
 function ensureConfig(config) {
   if (!config || typeof config !== "object") return;
   if (!Array.isArray(config.handlers)) config.handlers = [];
@@ -127,7 +132,11 @@ export const store = createStore("emailConfig", {
   presets: PRESETS,
 
   get providerOptions() {
-    return PROVIDER_OPTIONS;
+    return PROVIDER_OPTIONS.map((provider) => ({
+      ...provider,
+      label: tr(provider.label),
+      hint: tr(provider.hint),
+    }));
   },
 
   get handlers() {
@@ -175,6 +184,10 @@ export const store = createStore("emailConfig", {
     this.providerPickerOpen = null;
     this.guideOpen = false;
     this.didInit = false;
+  },
+
+  localizeText(value = "") {
+    return tr(value);
   },
 
   newHandler() {
@@ -267,7 +280,7 @@ export const store = createStore("emailConfig", {
   },
 
   providerLabel(value) {
-    return this.presets[value]?.label || "Custom IMAP";
+    return tr(this.presets[value]?.label || "Custom IMAP");
   },
 
   selectProvider(handler, value, idx = null) {
@@ -304,13 +317,13 @@ export const store = createStore("emailConfig", {
 
   providerHint(handler) {
     const provider = this.providerValue(handler);
-    if (provider === "gmail") return "Use a Google App Password. A regular Gmail password usually will not work here.";
-    if (provider === "icloud") return "Use an app-specific password from your Apple account settings.";
-    if (provider === "microsoft365") return "Most Outlook and Microsoft 365 inboxes work with this preset.";
-    if (provider === "yahoo") return "Yahoo Mail usually works best with an app password.";
-    if (provider === "exchange") return "Choose Exchange only if your organization requires it. For the simplest setup, try Outlook / Microsoft 365 first.";
-    if (provider === "custom-imap") return "Bring your own incoming and outgoing mail server details.";
-    return "How to start: turn on inbox, pick your provider, then add your email address and password.";
+    if (provider === "gmail") return tr("Use a Google App Password. A regular Gmail password usually will not work here.");
+    if (provider === "icloud") return tr("Use an app-specific password from your Apple account settings.");
+    if (provider === "microsoft365") return tr("Most Outlook and Microsoft 365 inboxes work with this preset.");
+    if (provider === "yahoo") return tr("Yahoo Mail usually works best with an app password.");
+    if (provider === "exchange") return tr("Choose Exchange only if your organization requires it. For the simplest setup, try Outlook / Microsoft 365 first.");
+    if (provider === "custom-imap") return tr("Bring your own incoming and outgoing mail server details.");
+    return tr("How to start: turn on inbox, pick your provider, then add your email address and password.");
   },
 
   providerHelpUrl(handler) {
@@ -319,7 +332,7 @@ export const store = createStore("emailConfig", {
 
   providerHelpLabel(handler) {
     if (this.providerValue(handler) !== "gmail") return "";
-    return "Google's guide to create a Gmail App Password";
+    return tr("Google's guide to create a Gmail App Password");
   },
 
   showManualServers(handler) {
@@ -331,13 +344,13 @@ export const store = createStore("emailConfig", {
   },
 
   incomingLabel(handler) {
-    return this.showExchangeServer(handler) ? "Exchange server" : "Incoming mail server";
+    return this.showExchangeServer(handler) ? tr("Exchange server") : tr("Incoming mail server");
   },
 
   incomingDescription(handler) {
     return this.showExchangeServer(handler)
-      ? "The Exchange or Microsoft 365 server for this inbox"
-      : "The IMAP server for incoming mail";
+      ? tr("The Exchange or Microsoft 365 server for this inbox")
+      : tr("The IMAP server for incoming mail");
   },
 
   incomingPlaceholder(handler) {
@@ -346,12 +359,12 @@ export const store = createStore("emailConfig", {
 
   scheduleLabel(handler) {
     const value = this.frequencyValue(handler);
-    if (value === "15") return "Checks every 15 seconds";
-    if (value === "30") return "Checks every 30 seconds";
-    if (value === "60") return "Checks every minute";
-    if (value === "300") return "Checks every 5 minutes";
-    if (value === "900") return "Checks every 15 minutes";
-    return "Uses a custom schedule";
+    if (value === "15") return tr("Checks every 15 seconds");
+    if (value === "30") return tr("Checks every 30 seconds");
+    if (value === "60") return tr("Checks every minute");
+    if (value === "300") return tr("Checks every 5 minutes");
+    if (value === "900") return tr("Checks every 15 minutes");
+    return tr("Uses a custom schedule");
   },
 
   frequencyValue(handler) {
@@ -373,7 +386,7 @@ export const store = createStore("emailConfig", {
 
   frequencyHint(handler) {
     return this.frequencyValue(handler) === "custom"
-      ? "You are using a custom schedule. You can change the raw timing in Advanced."
+      ? tr("You are using a custom schedule. You can change the raw timing in Advanced.")
       : this.scheduleLabel(handler);
   },
 
@@ -407,13 +420,13 @@ export const store = createStore("emailConfig", {
   missingBits(handler) {
     const missing = [];
     const provider = this.providerValue(handler);
-    if (!provider) missing.push("provider");
-    if (!handler.username) missing.push("email address");
-    if (!handler.password) missing.push("password");
+    if (!provider) missing.push(tr("provider"));
+    if (!handler.username) missing.push(tr("email address"));
+    if (!handler.password) missing.push(tr("password"));
     if ((this.showManualServers(handler) || this.showExchangeServer(handler)) && !handler.imap_server) {
-      missing.push(this.showExchangeServer(handler) ? "Exchange server" : "incoming server");
+      missing.push(this.showExchangeServer(handler) ? tr("Exchange server") : tr("incoming server"));
     }
-    if (this.showManualServers(handler) && !handler.smtp_server) missing.push("outgoing server");
+    if (this.showManualServers(handler) && !handler.smtp_server) missing.push(tr("outgoing server"));
     return missing;
   },
 
@@ -422,10 +435,10 @@ export const store = createStore("emailConfig", {
   },
 
   statusLabel(handler) {
-    if (!handler.username && !this.providerValue(handler)) return "New";
-    if (handler.enabled && this.canTest(handler)) return "Live";
-    if (this.canTest(handler)) return "Ready";
-    return "Needs info";
+    if (!handler.username && !this.providerValue(handler)) return tr("New");
+    if (handler.enabled && this.canTest(handler)) return tr("Live");
+    if (this.canTest(handler)) return tr("Ready");
+    return tr("Needs info");
   },
 
   statusTone(handler) {
@@ -444,29 +457,29 @@ export const store = createStore("emailConfig", {
     const provider = this.providerValue(handler);
     if (provider) pieces.push(this.providerLabel(provider));
     pieces.push(this.scheduleLabel(handler).replace("Checks ", ""));
-    if (handler.project) pieces.push(`Project: ${handler.project}`);
+    if (handler.project) pieces.push(`${tr("Project")}: ${handler.project}`);
     return pieces.join(" · ");
   },
 
   testButtonLabel(handler, idx) {
-    if (this.testing === idx) return "Checking...";
-    if (this.canTest(handler)) return "Check setup";
-    return "Fill in the basics first";
+    if (this.testing === idx) return tr("Checking...");
+    if (this.canTest(handler)) return tr("Check setup");
+    return tr("Fill in the basics first");
   },
 
   testIntro(handler) {
     if (this.providerValue(handler) === "exchange") {
-      return "We will check the inbox, check outgoing mail, then send a test email to this address.";
+      return tr("We will check the inbox, check outgoing mail, then send a test email to this address.");
     }
-    return "We will check incoming mail, check outgoing mail, then send a test email to this inbox.";
+    return tr("We will check incoming mail, check outgoing mail, then send a test email to this inbox.");
   },
 
   resultTitle(result) {
-    return result.test || "Check";
+    return tr(result.test || "Check");
   },
 
   resultMessage(result) {
-    return result.message || (result.ok ? "Done." : "Something went wrong.");
+    return tr(result.message || (result.ok ? "Done." : "Something went wrong."));
   },
 
   _startInitialHandlerFlow() {

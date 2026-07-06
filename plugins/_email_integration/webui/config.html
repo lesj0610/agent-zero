@@ -10,7 +10,7 @@
 <body>
     <div x-data x-init="$store.emailConfig.init(config, context)" x-destroy="$store.emailConfig.cleanup()">
         <template x-if="config">
-            <div class="email-settings">
+            <div class="email-settings" data-i18n-scope="settings">
                 <div class="section-title">Email</div>
 
                 <template x-if="$store.emailConfig.didInit && $store.emailConfig.handlers.length === 0">
@@ -55,10 +55,10 @@
                                     <div class="email-provider-topline">
                                         <div class="email-provider-copy">
                                             <div class="email-provider-title"
-                                                x-text="$store.emailConfig.hasProvider(handler) ? $store.emailConfig.providerLabel($store.emailConfig.providerValue(handler)) : 'Choose your email provider'">
+                                                x-text="$store.emailConfig.hasProvider(handler) ? $store.emailConfig.providerLabel($store.emailConfig.providerValue(handler)) : $store.emailConfig.localizeText('Choose your email provider')">
                                             </div>
                                             <div class="email-provider-description"
-                                                x-text="$store.emailConfig.hasProvider(handler) ? $store.emailConfig.providerHint(handler) : 'Pick a provider and Agent Zero will prepare the usual incoming and outgoing mail settings.'">
+                                                x-text="$store.emailConfig.hasProvider(handler) ? $store.emailConfig.providerHint(handler) : $store.emailConfig.localizeText('Pick a provider and Agent Zero will prepare the usual incoming and outgoing mail settings.')">
                                             </div>
                                             <template x-if="$store.emailConfig.providerHelpUrl(handler)">
                                                 <a class="email-intro-link"
@@ -71,7 +71,7 @@
                                         <template x-if="$store.emailConfig.hasProvider(handler)">
                                             <button type="button" class="btn btn-field email-change-provider"
                                                 @click.stop="$store.emailConfig.changeProvider(idx)"
-                                                x-text="$store.emailConfig.showProviderChoices(handler, idx) ? 'Done' : 'Change'">
+                                                x-text="$store.emailConfig.localizeText($store.emailConfig.showProviderChoices(handler, idx) ? 'Done' : 'Change')">
                                             </button>
                                         </template>
                                     </div>
@@ -238,6 +238,7 @@
                                         </div>
                                         <div class="field-control">
                                             <textarea x-model="handler.dispatcher_instructions" rows="3"
+                                                data-i18n-placeholder="email.placeholder.routing"
                                                 placeholder="Always start a new chat for invoices or billing questions."></textarea>
                                         </div>
                                     </div>
@@ -250,6 +251,7 @@
                                         </div>
                                         <div class="field-control">
                                             <textarea x-model="handler.agent_instructions" rows="3"
+                                                data-i18n-placeholder="email.placeholder.reply"
                                                 placeholder="Reply in a calm, concise tone."></textarea>
                                         </div>
                                     </div>
