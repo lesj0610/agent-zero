@@ -377,6 +377,10 @@ const model = {
     return translateStaticText("Idle");
   },
 
+  get enabledText() {
+    return translateStaticText(this.enabled ? "Yes" : "No");
+  },
+
   get statusClass() {
     if (!this.enabled) return "warn";
     if (this.modelLoading) return "warn";

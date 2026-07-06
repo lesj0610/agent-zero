@@ -47,7 +47,10 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert "const fallbackAttr = `data-i18n-${targetAttr}-fallback`;" in i18n_js
     assert "if (!el.hasAttribute(fallbackAttr))" in i18n_js
     assert "function isSettingsComponent(componentUrl)" in components_js
+    assert "function isInsideSettings(targetElement)" in components_js
+    assert "isSettingsComponent(componentUrl) || isInsideSettings(targetElement)" in components_js
     assert 'targetElement.setAttribute("data-i18n-scope", "settings")' in components_js
+    assert 'targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")' in extensions_js
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in modals_js
     assert "modal.title.textContent = translateStaticText(doc.title || modalPath);" in modals_js
     assert 'import ko from "./ko.js";' in locale_index_js
@@ -109,7 +112,9 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     skills_scan_store = _read("webui/components/settings/skills/skills-scan-store.js")
     plugins_store = _read("webui/components/settings/plugins/plugins-subsection-store.js")
     kokoro_store = _read("plugins/_kokoro_tts/webui/kokoro-tts-store.js")
+    kokoro_panel = _read("plugins/_kokoro_tts/webui/main.html")
     whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
+    whisper_panel = _read("plugins/_whisper_stt/webui/main.html")
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
     ko_js = _read("webui/js/i18n/locales/ko.js")
 
@@ -122,10 +127,16 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'return tr(plugin?.description || "No description provided.")' in plugins_store
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in kokoro_store
     assert 'return translateStaticText("Idle");' in kokoro_store
+    assert "get enabledText()" in kokoro_store
+    assert 'translateStaticText(this.enabled ? "Yes" : "No")' in kokoro_store
+    assert 'x-text="$store.kokoroTts.enabledText"' in kokoro_panel
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in whisper_store
     assert 'translateStaticText(MicStatusLabels[status] || "Microphone")' in whisper_store
     assert 'translateStaticText("System default")' in whisper_store
     assert '"Send immediately" : "Draft in composer"' in whisper_store
+    assert "get enabledText()" in whisper_store
+    assert 'translateStaticText(this.enabled ? "Yes" : "No")' in whisper_store
+    assert 'x-text="$store.whisperStt.enabledText"' in whisper_panel
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
     assert "title: translateStaticText('Main')" in model_config_store
     assert '"LiteLLM Global Settings": "LiteLLM 전역 설정"' in ko_js
@@ -138,3 +149,8 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"Manages LLM model selection and configuration for chat, utility, and embedding models. Supports per-project and per-agent overrides with optional per-chat model switching.":' in ko_js
     assert '"System default": "시스템 기본값"' in ko_js
     assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
+    assert '"Provider State": "제공자 상태"' in ko_js
+    assert '"Enabled": "활성화"' in ko_js
+    assert '"Yes": "예"' in ko_js
+    assert '"No": "아니요"' in ko_js
+    assert '"Request Mic Permission": "마이크 권한 요청"' in ko_js

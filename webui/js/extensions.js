@@ -37,6 +37,9 @@ export function clearCache() {
  * @returns {void}
  */
 function renderHtmlExtension(targetElement, html) {
+  if (targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")) {
+    targetElement.setAttribute("data-i18n-scope", "settings");
+  }
   targetElement.innerHTML = html;
   scheduleTranslations(targetElement);
 }

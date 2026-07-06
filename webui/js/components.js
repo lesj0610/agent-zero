@@ -13,6 +13,10 @@ function isSettingsComponent(componentUrl) {
   return componentUrl.startsWith("components/settings/") || componentUrl.startsWith("/components/settings/");
 }
 
+function isInsideSettings(targetElement) {
+  return Boolean(targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections"));
+}
+
 export async function importComponent(path, targetElement) {
   // Create a unique key for this import based on the target element
   const lockKey = targetElement.id || targetElement.getAttribute('data-component-id') || targetElement;
@@ -36,7 +40,7 @@ export async function importComponent(path, targetElement) {
 
     // full component url
     const componentUrl = path.startsWith("/") ? path : (path.startsWith("components/") ? path : "components/" + path);
-    if (isSettingsComponent(componentUrl)) {
+    if (isSettingsComponent(componentUrl) || isInsideSettings(targetElement)) {
       targetElement.setAttribute("data-i18n-scope", "settings");
     }
 
