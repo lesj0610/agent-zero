@@ -18,13 +18,16 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
 
     assert 'import { initI18n, t } from "/js/i18n/index.js";' in index_js
     assert "initI18n();" in index_js
-    assert 'import { applyTranslations } from "/js/i18n/index.js";' in components_js
-    assert "applyTranslations(targetElement);" in components_js
+    assert 'import { scheduleTranslations } from "/js/i18n/index.js";' in components_js
+    assert "scheduleTranslations(targetElement);" in components_js
     assert 'from "./locales/index.js";' in i18n_js
     assert 'replaceAll("_", "-")' in i18n_js
     assert "export function setLocalePreference" in i18n_js
     assert 'globalThis.Alpine.store("i18n"' in i18n_js
     assert "function getReactiveLocale()" in i18n_js
+    assert "export function scheduleTranslations" in i18n_js
+    assert "globalThis.Alpine.nextTick(reapply)" in i18n_js
+    assert 'document.addEventListener("alpine:initialized", reapply' in i18n_js
     assert "window.addEventListener(\"load\", reapplyInitialLocale" in i18n_js
     assert "document.dispatchEvent(" in i18n_js
     assert '"a0:locale-changed"' in i18n_js

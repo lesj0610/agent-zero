@@ -266,20 +266,51 @@ export function applyTranslations(root = document) {
   applyScopedStaticTranslations(root);
 }
 
+export function scheduleTranslations(root = document) {
+  if (!root) return;
+  applyTranslations(root);
+
+  const reapply = () => applyTranslations(root);
+  if (typeof queueMicrotask === "function") {
+    queueMicrotask(reapply);
+  } else {
+    Promise.resolve().then(reapply);
+  }
+
+  if (globalThis.Alpine?.nextTick) {
+    globalThis.Alpine.nextTick(reapply);
+  } else {
+    document.addEventListener("alpine:init", () => {
+      if (globalThis.Alpine?.nextTick) {
+        globalThis.Alpine.nextTick(reapply);
+      } else {
+        reapply();
+      }
+    }, { once: true });
+    document.addEventListener("alpine:initialized", reapply, { once: true });
+  }
+
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(reapply);
+  } else {
+    setTimeout(reapply, 0);
+  }
+}
+
 export function initI18n() {
   const locale = getCurrentLocale();
   const preference = getLocalePreference();
   setReactiveLocale(locale, preference);
   registerI18nStore();
   setDocumentLocale(locale);
-  applyTranslations(document);
+  scheduleTranslations(document);
 
   const reapplyInitialLocale = () => {
     const currentLocale = getCurrentLocale();
     const currentPreference = getLocalePreference();
     setReactiveLocale(currentLocale, currentPreference);
     setDocumentLocale(currentLocale);
-    applyTranslations(document);
+    scheduleTranslations(document);
     dispatchLocaleChanged(currentLocale, currentPreference);
   };
 
@@ -295,6 +326,7 @@ globalThis.A0_I18N = {
   getLocalePreference,
   getCurrentLocale,
   setLocalePreference,
+  scheduleTranslations,
   translateStaticText,
   t,
 };

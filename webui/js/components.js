@@ -1,7 +1,7 @@
 // Import a component into a target element
 // Import a component and recursively load its nested components
 // Returns the parsed document for additional processing
-import { applyTranslations } from "/js/i18n/index.js";
+import { scheduleTranslations } from "/js/i18n/index.js";
 
 // cache object to store loaded components
 const componentCache = {};
@@ -184,7 +184,7 @@ export async function importComponent(path, targetElement) {
       targetElement.removeChild(loadingEl);
     }
 
-    applyTranslations(targetElement);
+    scheduleTranslations(targetElement);
 
     // // Load any nested components
     // await loadComponents([targetElement]);
