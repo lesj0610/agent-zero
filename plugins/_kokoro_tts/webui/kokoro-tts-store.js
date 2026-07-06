@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import { toastFrontendError } from "/components/notifications/notification-store.js";
 import { callJsonApi } from "/js/api.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import { ttsService } from "/js/tts-service.js";
 
 const PLUGIN_NAME = "_kokoro_tts";
@@ -90,10 +91,10 @@ const model = {
   },
 
   get statusText() {
-    if (!this.enabled) return "Disabled";
-    if (this.modelLoading) return "Loading";
-    if (this.modelReady) return "Ready";
-    return "Idle";
+    if (!this.enabled) return translateStaticText("Disabled");
+    if (this.modelLoading) return translateStaticText("Loading");
+    if (this.modelReady) return translateStaticText("Ready");
+    return translateStaticText("Idle");
   },
 
   get statusClass() {

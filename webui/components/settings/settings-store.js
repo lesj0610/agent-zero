@@ -10,6 +10,7 @@ import {
   getCurrentLocale,
   getLocaleOptions,
   getLocalePreference,
+  scheduleTranslations,
   setLocalePreference,
   t,
   translateStaticText,
@@ -166,6 +167,7 @@ const model = {
         this.settings = response.settings;
         this.additional = response.additional || null;
         this.applyLocaleRuntime(this.settings);
+        this.scheduleSettingsTranslations();
       } else {
         throw new Error(t("settings.error.invalidResponse", "Invalid settings response"));
       }
@@ -301,8 +303,14 @@ const model = {
       this.uiLocalePreference = event?.detail?.preference || getLocalePreference();
       this._localizedNavItems = null;
       this._localizedNavLocale = null;
+      this.scheduleSettingsTranslations();
     };
     document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+  },
+
+  scheduleSettingsTranslations() {
+    const root = document.querySelector(".modal-inner.settings-modal") || document;
+    scheduleTranslations(root);
   },
 
   get uiLanguageOptions() {

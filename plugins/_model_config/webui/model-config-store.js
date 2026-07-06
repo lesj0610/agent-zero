@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import { fetchApi } from "/js/api.js";
 import { store as pluginSettingsStore } from "/components/plugins/plugin-settings-store.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import { apiKeysState, apiKeysMethods } from "/plugins/_model_config/webui/api-keys-mixin.js";
 import { switcherState, switcherMethods } from "/plugins/_model_config/webui/switcher-mixin.js";
 
@@ -431,9 +432,9 @@ export const store = createStore("modelConfig", {
     const embedP = data.embedding_providers || [];
     const label = (list, id) => (list.find(x => x.value === id) || {}).label || id || '\u2014';
     return [
-      { icon: 'chat', title: 'Main', cfg: cfg.chat_model, pList: chatP },
-      { icon: 'manufacturing', title: 'Utility', cfg: cfg.utility_model, pList: chatP },
-      { icon: 'database', title: 'Embedding', cfg: cfg.embedding_model, pList: embedP },
+      { icon: 'chat', title: translateStaticText('Main'), cfg: cfg.chat_model, pList: chatP },
+      { icon: 'manufacturing', title: translateStaticText('Utility'), cfg: cfg.utility_model, pList: chatP },
+      { icon: 'database', title: translateStaticText('Embedding'), cfg: cfg.embedding_model, pList: embedP },
     ].map(s => ({ icon: s.icon, title: s.title, provider: label(s.pList, s.cfg?.provider), name: s.cfg?.name || '\u2014' }));
   },
 

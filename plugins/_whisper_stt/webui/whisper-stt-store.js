@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import { toastFrontendError } from "/components/notifications/notification-store.js";
 import { callJsonApi } from "/js/api.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import { sttService } from "/js/stt-service.js";
 import { ttsService } from "/js/tts-service.js";
 import { sendMessage, updateChatInput } from "/index.js";
@@ -180,7 +181,7 @@ const model = {
     if (!microphoneButton) return;
 
     const status = this.enabled ? this.micStatus : "disabled";
-    const label = MicStatusLabels[status] || "Microphone";
+    const label = translateStaticText(MicStatusLabels[status] || "Microphone");
     clearMicrophoneTooltip(microphoneButton);
     microphoneButton.classList.remove(...MicButtonClasses);
     microphoneButton.classList.add(`mic-${status}`);
@@ -259,7 +260,9 @@ const model = {
     } catch (error) {
       console.error("[Whisper STT] Microphone permission denied", error);
       globalThis.toast?.(
-        "Microphone access denied. Please enable microphone access in your browser settings.",
+        translateStaticText(
+          "Microphone access denied. Please enable microphone access in your browser settings.",
+        ),
         "error",
       );
       return false;
@@ -275,7 +278,10 @@ const model = {
     try {
       await this.ensureStatusLoaded({ force: true, suppressError: false });
       if (!this.enabled) {
-        globalThis.justToast?.("Whisper STT is disabled.", "info");
+        globalThis.justToast?.(
+          translateStaticText("Whisper STT is disabled."),
+          "info",
+        );
         return;
       }
 
@@ -359,14 +365,16 @@ const model = {
   },
 
   get messageModeLabel() {
-    return this.sendsImmediately ? "Send immediately" : "Draft in composer";
+    return translateStaticText(
+      this.sendsImmediately ? "Send immediately" : "Draft in composer",
+    );
   },
 
   get statusText() {
-    if (!this.enabled) return "Disabled";
-    if (this.modelLoading) return "Loading";
-    if (this.modelReady) return "Ready";
-    return "Idle";
+    if (!this.enabled) return translateStaticText("Disabled");
+    if (this.modelLoading) return translateStaticText("Loading");
+    if (this.modelReady) return translateStaticText("Ready");
+    return translateStaticText("Idle");
   },
 
   get statusClass() {
@@ -378,8 +386,8 @@ const model = {
 
   get selectedDeviceLabel() {
     const device = this.getSelectedDevice();
-    if (!device) return "System default";
-    return device.label || "System default";
+    if (!device) return translateStaticText("System default");
+    return device.label || translateStaticText("System default");
   },
 };
 

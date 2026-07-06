@@ -36,11 +36,11 @@ const model = {
   },
 
   displayPluginName(plugin) {
-    return plugin?.display_name || plugin?.name || tr("(unnamed plugin)");
+    return tr(plugin?.display_name || plugin?.name || "(unnamed plugin)");
   },
 
   displayPluginDescription(plugin) {
-    return plugin?.description || tr("No description provided.");
+    return tr(plugin?.description || "No description provided.");
   },
 
   async load() {

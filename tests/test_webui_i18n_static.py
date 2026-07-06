@@ -11,6 +11,7 @@ def _read(relative_path: str) -> str:
 def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> None:
     index_js = _read("webui/index.js")
     components_js = _read("webui/js/components.js")
+    extensions_js = _read("webui/js/extensions.js")
     modals_js = _read("webui/js/modals.js")
     i18n_js = _read("webui/js/i18n/index.js")
     locale_index_js = _read("webui/js/i18n/locales/index.js")
@@ -20,6 +21,9 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert "initI18n();" in index_js
     assert 'import { scheduleTranslations } from "/js/i18n/index.js";' in components_js
     assert "scheduleTranslations(targetElement);" in components_js
+    assert 'import { scheduleTranslations } from "./i18n/index.js";' in extensions_js
+    assert "function renderHtmlExtension(targetElement, html)" in extensions_js
+    assert "scheduleTranslations(targetElement);" in extensions_js
     assert 'from "./locales/index.js";' in i18n_js
     assert 'replaceAll("_", "-")' in i18n_js
     assert "export function setLocalePreference" in i18n_js
@@ -68,6 +72,8 @@ def test_settings_locale_section_exposes_ui_language_choice() -> None:
     assert "get uiLanguageOptions()" in store
     assert "setUiLanguagePreference(value)" in store
     assert "bindUiLocaleRuntime()" in store
+    assert "scheduleSettingsTranslations()" in store
+    assert "scheduleTranslations(root);" in store
     assert "getLocalePreference()" in store
     assert "getLocaleOptions()" in store
     assert 'data-i18n="settings.locale.uiLanguage"' in locale
@@ -102,6 +108,9 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     mcp_store = _read("webui/components/settings/mcp/client/mcp-servers-store.js")
     skills_scan_store = _read("webui/components/settings/skills/skills-scan-store.js")
     plugins_store = _read("webui/components/settings/plugins/plugins-subsection-store.js")
+    kokoro_store = _read("plugins/_kokoro_tts/webui/kokoro-tts-store.js")
+    whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
+    model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
     ko_js = _read("webui/js/i18n/locales/ko.js")
 
     assert 'this.localizeText("Remote Control")' in tunnel_store
@@ -109,7 +118,23 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'tr("Failed to create scan chat")' in skills_scan_store
     assert "displayPluginName(plugin)" in plugins_store
     assert "displayPluginDescription(plugin)" in plugins_store
+    assert 'return tr(plugin?.display_name || plugin?.name || "(unnamed plugin)")' in plugins_store
+    assert 'return tr(plugin?.description || "No description provided.")' in plugins_store
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in kokoro_store
+    assert 'return translateStaticText("Idle");' in kokoro_store
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in whisper_store
+    assert 'translateStaticText(MicStatusLabels[status] || "Microphone")' in whisper_store
+    assert 'translateStaticText("System default")' in whisper_store
+    assert '"Send immediately" : "Draft in composer"' in whisper_store
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
+    assert "title: translateStaticText('Main')" in model_config_store
     assert '"LiteLLM Global Settings": "LiteLLM 전역 설정"' in ko_js
     assert '"This browser\'s Agent Zero WebUI language.": "이 브라우저에서 사용할 Agent Zero WebUI 언어입니다."' in ko_js
     assert '"Conflict policy:": "충돌 정책:"' in ko_js
     assert '"Tools exposed by this MCP server.": "이 MCP 서버가 노출하는 도구입니다."' in ko_js
+    assert '"Draft in composer": "작성창에 초안으로 넣기"' in ko_js
+    assert '"Main": "메인"' in ko_js
+    assert '"Memory": "메모리"' in ko_js
+    assert '"Manages LLM model selection and configuration for chat, utility, and embedding models. Supports per-project and per-agent overrides with optional per-chat model switching.":' in ko_js
+    assert '"System default": "시스템 기본값"' in ko_js
+    assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
