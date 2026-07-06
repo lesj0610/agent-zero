@@ -1,5 +1,6 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as Sleep from "/js/sleep.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 // define the model object holding data and functions
 const model = {
@@ -21,6 +22,10 @@ const model = {
     this.checkTunnelStatus();
   },
 
+  localizeText(value) {
+    return translateStaticText(value);
+  },
+
   cleanup() {
     this.stopNotificationPolling();
   },
@@ -32,9 +37,9 @@ const model = {
   },
 
   get copyLinkLabel() {
-    if (this.copyState === "success") return "Copied";
-    if (this.copyState === "error") return "Copy failed";
-    return "Copy link";
+    if (this.copyState === "success") return this.localizeText("Copied");
+    if (this.copyState === "error") return this.localizeText("Copy failed");
+    return this.localizeText("Copy link");
   },
 
   get loginActionVisible() {
@@ -42,14 +47,14 @@ const model = {
   },
 
   get loginActionTitle() {
-    return this.loginProvider === "tailscale" ? "Tailscale sign-in" : "Microsoft sign-in";
+    return this.localizeText(this.loginProvider === "tailscale" ? "Tailscale sign-in" : "Microsoft sign-in");
   },
 
   get loginActionCopy() {
     if (this.loginProvider === "tailscale") {
-      return "Open the Tailscale link to approve this container or enable Funnel. Agent Zero will continue when Tailscale reports the public URL.";
+      return this.localizeText("Open the Tailscale link to approve this container or enable Funnel. Agent Zero will continue when Tailscale reports the public URL.");
     }
-    return "Approve the tunnel request, then Agent Zero will finish enabling Remote Control.";
+    return this.localizeText("Approve the tunnel request, then Agent Zero will finish enabling Remote Control.");
   },
 
   clearMicrosoftLogin() {
@@ -63,14 +68,14 @@ const model = {
     if (!this.microsoftLoginCode) return;
     navigator.clipboard.writeText(this.microsoftLoginCode).then(() => {
       this.codeCopied = true;
-      window.toastFrontendInfo("Login code copied to clipboard!", "Clipboard");
+      window.toastFrontendInfo(this.localizeText("Login code copied to clipboard!"), this.localizeText("Clipboard"));
       // Reset after 3 seconds
       setTimeout(() => {
         this.codeCopied = false;
       }, 3000);
     }).catch((err) => {
       console.error("Failed to copy code: ", err);
-      window.toastFrontendError("Failed to copy login code", "Clipboard Error");
+      window.toastFrontendError(this.localizeText("Failed to copy login code"), this.localizeText("Clipboard Error"));
     });
   },
 
@@ -84,7 +89,7 @@ const model = {
           break;
         case "download_progress":
           if (n.data && n.data.percent !== undefined) {
-            this.loadingText = `Downloading: ${n.data.percent.toFixed(1)}%`;
+            this.loadingText = `${this.localizeText("Downloading")}: ${n.data.percent.toFixed(1)}%`;
           } else {
             this.loadingText = n.message;
           }
@@ -103,15 +108,15 @@ const model = {
             this.microsoftLoginCode = n.data.code || "";
             this.microsoftLoginUrl = n.data.url || "";
             this.loadingText = this.loginProvider === "tailscale"
-              ? "Waiting for Tailscale approval..."
-              : "Waiting for Microsoft login...";
+              ? this.localizeText("Waiting for Tailscale approval...")
+              : this.localizeText("Waiting for Microsoft login...");
           } else {
             this.loadingText = n.message;
           }
           break;
         case "error":
           this.hasError = true;
-          window.toastFrontendError(n.message, "Remote Control");
+          window.toastFrontendError(n.message, this.localizeText("Remote Control"));
           this.stopNotificationPolling();
           break;
         case "tunnel_url":
@@ -260,7 +265,7 @@ const model = {
       this.isLoading = true;
       this.hasError = false;
       this.clearMicrosoftLogin();
-      this.loadingText = "Refreshing tunnel...";
+      this.loadingText = this.localizeText("Refreshing tunnel...");
 
       try {
         // First stop any existing tunnel
@@ -283,7 +288,7 @@ const model = {
         await this.generateLink();
       } catch (error) {
         console.error("Error refreshing tunnel:", error);
-        window.toastFrontendError("Error refreshing Remote Control", "Remote Control");
+        window.toastFrontendError(this.localizeText("Error refreshing Remote Control"), this.localizeText("Remote Control"));
         this.isLoading = false;
         this.loadingText = "";
       }
@@ -307,9 +312,9 @@ const model = {
       // If no authentication is set, warn the user
       if (!hasAuth) {
         const proceed = confirm(
-          "Remote Control works best with sign-in enabled.\n\n" +
-            "Without a login, anyone with the URL can reach this Agent Zero instance.\n\n" +
-            "Turn on authentication in Settings before sharing this link. Continue anyway?"
+          this.localizeText("Remote Control works best with sign-in enabled.") + "\n\n" +
+            this.localizeText("Without a login, anyone with the URL can reach this Agent Zero instance.") + "\n\n" +
+            this.localizeText("Turn on authentication in Settings before sharing this link. Continue anyway?")
         );
 
         if (!proceed) {
@@ -324,7 +329,7 @@ const model = {
     this.isLoading = true;
     this.hasError = false;
     this.clearMicrosoftLogin();
-    this.loadingText = "Starting tunnel...";
+    this.loadingText = this.localizeText("Starting tunnel...");
 
     // Start polling for notifications
     this.startNotificationPolling();
@@ -352,7 +357,7 @@ const model = {
       // Check for error
       if (!data.success && data.message) {
         this.hasError = true;
-        window.toastFrontendError(data.message, "Remote Control");
+        window.toastFrontendError(data.message, this.localizeText("Remote Control"));
         console.error("Tunnel creation failed:", data);
         this.stopNotificationPolling();
         return;
@@ -371,12 +376,12 @@ const model = {
 
         // Show success message to confirm creation
         window.toastFrontendInfo(
-          "Remote Control is ready",
-          "Remote Control"
+          this.localizeText("Remote Control is ready"),
+          this.localizeText("Remote Control")
         );
       }
     } catch (error) {
-      window.toastFrontendError("Error creating Remote Control", "Remote Control");
+      window.toastFrontendError(this.localizeText("Error creating Remote Control"), this.localizeText("Remote Control"));
       console.error("Error creating tunnel:", error);
     } finally {
       this.isLoading = false;
@@ -390,11 +395,11 @@ const model = {
   async stopTunnel() {
     if (
       confirm(
-        "Stop Remote Control? The current URL will no longer be accessible."
+        this.localizeText("Stop Remote Control? The current URL will no longer be accessible.")
       )
     ) {
       this.isLoading = true;
-      this.loadingText = "Stopping tunnel...";
+      this.loadingText = this.localizeText("Stopping tunnel...");
 
       try {
         // Call the backend to stop the tunnel
@@ -424,14 +429,14 @@ const model = {
           this.linkGenerated = false;
 
           window.toastFrontendInfo(
-            "Remote Control stopped",
-            "Remote Control"
+            this.localizeText("Remote Control stopped"),
+            this.localizeText("Remote Control")
           );
         } else {
-          window.toastFrontendError("Failed to stop Remote Control", "Remote Control");
+          window.toastFrontendError(this.localizeText("Failed to stop Remote Control"), this.localizeText("Remote Control"));
         }
       } catch (error) {
-        window.toastFrontendError("Error stopping Remote Control", "Remote Control");
+        window.toastFrontendError(this.localizeText("Error stopping Remote Control"), this.localizeText("Remote Control"));
         console.error("Error stopping tunnel:", error);
       } finally {
         this.isLoading = false;
@@ -450,8 +455,8 @@ const model = {
 
         // Show toast notification
         window.toastFrontendInfo(
-          "Remote Control URL copied",
-          "Clipboard"
+          this.localizeText("Remote Control URL copied"),
+          this.localizeText("Clipboard")
         );
 
         // Reset button after 2 seconds
@@ -463,8 +468,8 @@ const model = {
         console.error("Failed to copy URL: ", err);
         this.copyState = "error";
         window.toastFrontendError(
-          "Failed to copy Remote Control URL",
-          "Clipboard Error"
+          this.localizeText("Failed to copy Remote Control URL"),
+          this.localizeText("Clipboard Error")
         );
 
         // Reset button after 2 seconds

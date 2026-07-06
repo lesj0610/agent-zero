@@ -46,6 +46,9 @@ def test_timezone_settings_section_is_present():
     assert agent_settings.index("section-locale") < agent_settings.index("section-agent-plugins")
     assert agent_settings.rindex("section-locale") < agent_settings.rindex("section-agent-plugins")
     locale = locale_path.read_text(encoding="utf-8")
+    assert "setUiLanguagePreference" in locale
+    assert "uiLanguageOptions" in locale
+    assert 'data-i18n="settings.locale.uiLanguage"' in locale
     assert "Automatic (browser)" in locale
     assert "$store.settings.settings.timezone" in locale
     assert "12-hour (AM/PM)" in locale

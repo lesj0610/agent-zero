@@ -12,9 +12,9 @@
       <div class="chats-list-container" x-data>
         <x-extension id="sidebar-chats-list-start"></x-extension>
         <div class="section-header-row">
-          <h3 class="section-header">Chats</h3>
+          <h3 class="section-header" data-i18n="sidebar.chats">Chats</h3>
           <!-- New Chat Button -->
-          <button id="newChat" class="btn-icon-action chat-list-action-btn" @click="$store.chats.newChat()" aria-label="New Chat" title="New Chat" data-bs-placement="top" data-bs-trigger="hover">
+          <button id="newChat" class="btn-icon-action chat-list-action-btn" @click="$store.chats.newChat()" aria-label="New Chat" title="New Chat" data-i18n-aria-label="sidebar.newChat" data-i18n-title="sidebar.newChat" data-bs-placement="top" data-bs-trigger="hover">
             <span class="material-symbols-outlined">chat_add_on</span>
           </button>
           <x-extension id="chats-header-controls"></x-extension>
@@ -31,7 +31,7 @@
                         x-show="$store.chats.hasChildren(context.id)"
                         :class="{ 'is-visible': $store.chats.hasChildren(context.id), 'is-expanded': $store.chats.isExpanded(context.id) }"
                         :aria-expanded="$store.chats.isExpanded(context.id)"
-                        :aria-label="$store.chats.isExpanded(context.id) ? 'Collapse chat children' : 'Expand chat children'"
+                        :aria-label="$store.chats.isExpanded(context.id) ? A0_I18N.t('sidebar.collapseChatChildren', 'Collapse chat children') : A0_I18N.t('sidebar.expandChatChildren', 'Expand chat children')"
                         @click.stop="$store.chats.toggleChildren(context.id)">
                   <span class="material-symbols-outlined"
                     x-text="$store.chats.isExpanded(context.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"></span>
@@ -42,7 +42,7 @@
                   <span class="chat-name"
                     x-text="$store.chats.displayName(context)"></span>
                 </div>
-                <button class="btn-icon-action chat-list-action-btn" title="Close chat" @click.stop="$confirmClick($event, () => $store.chats.killChat(context.id))">
+                <button class="btn-icon-action chat-list-action-btn" title="Close chat" data-i18n-title="sidebar.closeChat" @click.stop="$confirmClick($event, () => $store.chats.killChat(context.id))">
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -58,7 +58,7 @@
                         <span class="chat-name"
                           x-text="$store.chats.displayName(child)"></span>
                       </div>
-                      <button class="btn-icon-action chat-list-action-btn" title="Close chat" @click.stop="$confirmClick($event, () => $store.chats.killChat(child.id))">
+                      <button class="btn-icon-action chat-list-action-btn" title="Close chat" data-i18n-title="sidebar.closeChat" @click.stop="$confirmClick($event, () => $store.chats.killChat(child.id))">
                         <span class="material-symbols-outlined">close</span>
                       </button>
                     </div>
@@ -69,7 +69,7 @@
           </template>
         </ul>
         <div class="empty-list-message" x-show="$store.chats.topLevelContexts().length === 0">
-          <p><i>No chats to list.</i></p>
+          <p><i data-i18n="sidebar.noChats">No chats to list.</i></p>
         </div>
         <x-extension id="sidebar-chats-list-end"></x-extension>
       </div>

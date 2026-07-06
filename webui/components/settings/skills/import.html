@@ -66,7 +66,7 @@
                 </div>
 
                 <div x-show="$store.skillsImportStore.loading" class="loading">
-                    <span x-text="$store.skillsImportStore.loadingMessage || 'Processing...'"></span>
+                    <span x-text="$store.settings.localizeText($store.skillsImportStore.loadingMessage || 'Processing...')"></span>
                 </div>
 
                 <div x-show="$store.skillsImportStore.error" class="error">

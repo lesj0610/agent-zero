@@ -5,6 +5,7 @@ import { store as projectsStore } from "/components/projects/projects-store.js";
 import { store as fileBrowserStore } from "/components/modals/file-browser/file-browser-store.js";
 import * as API from "/js/api.js";
 import { getCurrentUserISOString } from "/js/time-utils.js";
+import { getCurrentLocale, t } from "/js/i18n/index.js";
 
 const model = {
   // State
@@ -13,6 +14,8 @@ const model = {
   lastBannerRefresh: 0,
   hasDismissedBanners: false,
   _initialized: false,
+  _localeChangeHandler: null,
+  uiLocale: getCurrentLocale(),
 
   get isVisible() {
     return !chatsStore.selected;
@@ -28,6 +31,12 @@ const model = {
         this.refreshBanners(true);
       }
     });
+    if (!this._localeChangeHandler) {
+      this._localeChangeHandler = (event) => {
+        this.uiLocale = event?.detail?.locale || getCurrentLocale();
+      };
+      document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+    }
   },
 
   onCreate() {
@@ -153,7 +162,8 @@ const model = {
   },
 
   get heroSubtitle() {
-    return "How can I help you today?";
+    this.uiLocale;
+    return t("welcome.subtitle", "How can I help you today?");
   },
 
   executeBannerAction(action) {

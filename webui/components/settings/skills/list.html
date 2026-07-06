@@ -73,7 +73,7 @@
                         <div class="skill-card">
                             <div class="skill-header">
                                 <div class="skill-heading">
-                                    <div class="skill-title" x-text="skill.name || '(unnamed skill)'"></div>
+                                    <div class="skill-title" x-text="$store.skillsListStore.displaySkillName(skill)"></div>
                                     <code class="skill-path" x-text="skill.path"></code>
                                 </div>
                                 <div class="skill-actions">
@@ -87,7 +87,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="skill-description" x-text="skill.description || 'No description provided.'"></div>
+                            <div class="skill-description" x-text="$store.skillsListStore.displaySkillDescription(skill)"></div>
                         </div>
                     </template>
                 </div>

@@ -29,8 +29,8 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "openBlockingSetup()" not in welcome
     assert '.filter((b) => b.id !== "missing-api-key")' in welcome_store
     assert "get heroSubtitle()" in welcome_store
-    assert 'return "How can I help you today?";' in welcome_store
-    assert '<h2>Quick Actions</h2>' in welcome
+    assert 't("welcome.subtitle", "How can I help you today?")' in welcome_store
+    assert 'data-i18n="welcome.quickActions">Quick Actions' in welcome
     assert 'class="welcome-lower-grid"' in welcome
     assert 'x-extension id="welcome-actions-end"' in welcome
     assert "grid-template-columns: repeat(4, minmax(0, 1fr));" in welcome
@@ -93,7 +93,7 @@ def test_welcome_composer_can_create_a_chat_before_sending() -> None:
     gate_store = _read("webui/components/chat/model-gate-store.js")
     gate_component = _read("webui/components/chat/model-setup-gate.html")
 
-    assert 'return "Ask anything to start a new chat";' in input_store
+    assert 't("chat.placeholder.start", "Ask anything to start a new chat")' in input_store
     assert "if (!chatsStore.selected" in input_store
     assert "await chatsStore.newChat()" in input_store
     assert "return response.ctxid;" in chats_store

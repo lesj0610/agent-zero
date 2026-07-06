@@ -12,7 +12,7 @@
     <div x-data>
         <template x-if="$store.mcpServersStore">
             <div id="mcp-servers-log">
-                <p x-text="$store.mcpServersStore.serverLog && $store.mcpServersStore.serverLog.trim() ? $store.mcpServersStore.serverLog : 'Log empty'"></p>
+                <p x-text="$store.mcpServersStore.serverLog && $store.mcpServersStore.serverLog.trim() ? $store.mcpServersStore.serverLog : $store.mcpServersStore.localizeText('Log empty')"></p>
             </div>
         </template>
     </div>

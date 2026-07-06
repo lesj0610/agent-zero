@@ -5,6 +5,7 @@ import * as API from "/js/api.js";
 import { openModal } from "/js/modals.js";
 import { store as settingsStore } from "/components/settings/settings-store.js";
 import { getUserTimezone } from "/js/time-utils.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import {
   toastFrontendError,
   toastFrontendSuccess,
@@ -21,6 +22,10 @@ const SCAN_TITLE = "MCP Scanner";
 let scanChecksConfig = null;
 let scanPromptTemplate = null;
 let scanPollGeneration = 0;
+
+function tr(value) {
+  return translateStaticText(value);
+}
 
 async function fetchText(url, label) {
   const response = await fetch(url);
@@ -311,7 +316,7 @@ const model = {
       }
     } catch (error) {
       console.error("Failed to load settings for MCP manager:", error);
-      void toastFrontendError("Failed to load settings for MCP manager", "MCP Servers");
+      void toastFrontendError(tr("Failed to load settings for MCP manager"), tr("MCP Servers"));
     }
   },
 
@@ -338,7 +343,7 @@ const model = {
         this.configureProjectScope(normalizedProject, response.data, true);
       } catch (error) {
         console.error("Failed to load project MCP config:", error);
-        void toastFrontendError("Failed to load project MCP config", "MCP Servers");
+        void toastFrontendError(tr("Failed to load project MCP config"), tr("MCP Servers"));
         return;
       }
     } else {
@@ -367,15 +372,15 @@ const model = {
   },
 
   get scopeTitle() {
-    if (this.scope === "project") return `Project MCP servers`;
-    return "Global MCP servers";
+    if (this.scope === "project") return tr("Project MCP servers");
+    return tr("Global MCP servers");
   },
 
   get scopeSubtitle() {
     if (this.scope === "project") {
-      return this.projectName ? `Project: ${this.projectName}` : "Project scope";
+      return this.projectName ? `${tr("Project")}: ${this.projectName}` : tr("Project scope");
     }
-    return "Available to every chat unless a project overrides a server.";
+    return tr("Available to every chat unless a project overrides a server.");
   },
 
   getStatusPayload() {
@@ -473,15 +478,15 @@ const model = {
 
   get configuredServersCountLabel() {
     const total = this.configuredServers.length;
-    if (!this.serverSearchActive) return `${total} total`;
-    return `${this.filteredConfiguredServers.length} of ${total}`;
+    if (!this.serverSearchActive) return `${total} ${tr("total")}`;
+    return `${this.filteredConfiguredServers.length} ${tr("of")} ${total}`;
   },
 
   get visibleServersCountLabel() {
-    if (this.loading) return "Loading";
+    if (this.loading) return tr("Loading");
     const total = this.servers.length;
-    if (!this.serverSearchActive) return `${total} visible`;
-    return `${this.filteredServers.length} of ${total}`;
+    if (!this.serverSearchActive) return `${total} ${tr("visible")}`;
+    return `${this.filteredServers.length} ${tr("of")} ${total}`;
   },
 
   clearServerSearch() {
@@ -503,8 +508,16 @@ const model = {
   get serverDetailToolsCountLabel() {
     const total = this.serverDetailTools.length;
     const query = String(this.toolSearch || "").trim();
-    if (!query) return `${total} tools`;
-    return `${this.filteredServerDetailTools.length} of ${total}`;
+    if (!query) return `${total} ${tr("tools")}`;
+    return `${this.filteredServerDetailTools.length} ${tr("of")} ${total}`;
+  },
+
+  toolCountLabel(count) {
+    return `${count || 0} ${tr("tools")}`;
+  },
+
+  localizeText(value) {
+    return tr(value);
   },
 
   clearToolSearch() {
@@ -524,10 +537,10 @@ const model = {
   formatJson() {
     try {
       this.setEditorValue(stringifyConfig(this.getConfigObject()));
-      void toastFrontendSuccess("MCP JSON reformatted", "MCP Servers");
+      void toastFrontendSuccess(tr("MCP JSON reformatted"), tr("MCP Servers"));
     } catch (error) {
       console.error("Failed to format JSON:", error);
-      void toastFrontendError(`Invalid JSON: ${error.message}`, "MCP Servers");
+      void toastFrontendError(`${tr("Invalid JSON")}: ${error.message}`, tr("MCP Servers"));
     }
   },
 
@@ -552,7 +565,7 @@ const model = {
   buildServerFromForm() {
     const form = this.serverForm;
     const name = normalizeName(form.name || (form.mode === "remote" ? deriveNameFromUrl(form.url) : deriveNameFromCommand(form.command, form.argsText)));
-    if (!name) throw new Error("Name is required");
+    if (!name) throw new Error(tr("Name is required"));
 
     const server = {
       name,
@@ -571,16 +584,16 @@ const model = {
     }
 
     if (form.mode === "remote") {
-      if (!form.url.trim()) throw new Error("Remote MCP server URL is required");
+      if (!form.url.trim()) throw new Error(tr("Remote MCP server URL is required"));
       server.url = form.url.trim();
       server.type = form.type || "streamable-http";
       server.verify = form.verify !== false;
       const headers = parseKeyValueText(form.headersText);
       if (Object.keys(headers).length) server.headers = headers;
     } else {
-      if (!form.command.trim()) throw new Error("Local command is required");
+      if (!form.command.trim()) throw new Error(tr("Local command is required"));
       const parts = getLocalCommandParts(form);
-      if (!parts.command) throw new Error("Local command is required");
+      if (!parts.command) throw new Error(tr("Local command is required"));
       server.type = "stdio";
       server.command = parts.command;
       if (parts.args.length) server.args = parts.args;
@@ -603,7 +616,7 @@ const model = {
       return cfg;
     } catch (error) {
       console.error("Failed to load MCP scanner framework:", error);
-      void toastFrontendError(`Failed to load MCP scanner: ${error.message || error}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Failed to load MCP scanner")}: ${error.message || error}`, tr(SCAN_TITLE));
       return null;
     }
   },
@@ -626,7 +639,7 @@ const model = {
     try {
       server = this.buildServerFromForm();
     } catch (error) {
-      void toastFrontendError(error.message || String(error), SCAN_TITLE);
+      void toastFrontendError(error.message || String(error), tr(SCAN_TITLE));
       return false;
     }
 
@@ -695,7 +708,7 @@ const model = {
       this.scanPrompt = prompt;
     } catch (error) {
       console.error("Failed to build MCP scan prompt:", error);
-      void toastFrontendError(`Failed to build scan prompt: ${error.message || error}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Failed to build scan prompt")}: ${error.message || error}`, tr(SCAN_TITLE));
     }
   },
 
@@ -710,12 +723,12 @@ const model = {
         allow_local_execution: !!this.scanOptions.allowLocalExecution,
         allow_remote_network: !!this.scanOptions.allowRemoteNetwork,
       });
-      if (!response?.success) throw new Error(response?.error || "Scan failed");
+      if (!response?.success) throw new Error(response?.error || tr("Scan failed"));
       this.scanResult = response;
       await this.buildScanPrompt();
     } catch (error) {
       console.error("MCP scan failed:", error);
-      void toastFrontendError(`MCP scan failed: ${error.message || error}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("MCP scan failed")}: ${error.message || error}`, tr(SCAN_TITLE));
     } finally {
       this.scanLoading = false;
     }
@@ -725,7 +738,7 @@ const model = {
     try {
       await navigator.clipboard.writeText(this.scanPrompt || "");
     } catch {
-      void toastFrontendError("Failed to copy the scan prompt", SCAN_TITLE);
+      void toastFrontendError(tr("Failed to copy the scan prompt"), tr(SCAN_TITLE));
     }
   },
 
@@ -736,7 +749,7 @@ const model = {
 
     const prompt = String(this.scanPrompt || "").trim();
     if (!prompt) {
-      void toastFrontendError("Scan prompt is empty", SCAN_TITLE);
+      void toastFrontendError(tr("Scan prompt is empty"), tr(SCAN_TITLE));
       return;
     }
 
@@ -746,7 +759,7 @@ const model = {
     let ctxId = "";
     try {
       const resp = await API.callJsonApi("/chat_create", {});
-      if (!resp?.ok || !resp.ctxid) throw new Error(resp?.message || "Failed to create scan chat");
+      if (!resp?.ok || !resp.ctxid) throw new Error(resp?.message || tr("Failed to create scan chat"));
       ctxId = resp.ctxid;
       this.scanCtxId = ctxId;
       await API.callJsonApi("/message_queue_add", { context: ctxId, text: prompt });
@@ -756,7 +769,7 @@ const model = {
     } catch (error) {
       this.agentScanning = false;
       console.error("MCP agent scan failed:", error);
-      void toastFrontendError(`Scan failed: ${error.message || error}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Scan failed")}: ${error.message || error}`, tr(SCAN_TITLE));
     }
   },
 
@@ -766,7 +779,7 @@ const model = {
     while (gen === scanPollGeneration) {
       if (Date.now() >= deadline) {
         this.agentScanning = false;
-        void toastFrontendError("Scan timed out while waiting for Agent Zero", SCAN_TITLE);
+        void toastFrontendError(tr("Scan timed out while waiting for Agent Zero"), tr(SCAN_TITLE));
         return;
       }
       await sleep(SCAN_POLL_INTERVAL_MS);
@@ -814,7 +827,7 @@ const model = {
     try {
       server = this.buildServerFromForm();
     } catch (error) {
-      void toastFrontendError(error.message || String(error), "MCP Servers");
+      void toastFrontendError(error.message || String(error), tr("MCP Servers"));
       return;
     }
 
@@ -831,11 +844,11 @@ const model = {
       }
       this.setEditorValue(stringifyConfig(config));
       this.resetForm();
-      void toastFrontendSuccess("MCP server added to draft config", "MCP Servers");
+      void toastFrontendSuccess(tr("MCP server added to draft config"), tr("MCP Servers"));
       requestAnimationFrame(() => globalThis.scrollModal?.("mcp-configured-servers"));
     } catch (error) {
       console.error("Failed to add MCP server:", error);
-      void toastFrontendError(`Failed to add MCP server: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Failed to add MCP server")}: ${error.message || error}`, tr("MCP Servers"));
     }
   },
 
@@ -884,7 +897,7 @@ const model = {
       }
 
       if (!removed) {
-        void toastFrontendWarning("MCP server is no longer in this config.", "MCP Servers");
+        void toastFrontendWarning(tr("MCP server is no longer in this config."), tr("MCP Servers"));
         await this.loadStatus({ silent: true });
         return;
       }
@@ -893,7 +906,7 @@ const model = {
       if (normalizeName(this.serverForm.name) === normalized) this.resetForm();
       await this.applyNow({ successMessage: "MCP server removed" });
     } catch (error) {
-      void toastFrontendError(`Failed to remove MCP server: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Failed to remove MCP server")}: ${error.message || error}`, tr("MCP Servers"));
     }
   },
 
@@ -908,7 +921,7 @@ const model = {
       }
       this.setEditorValue(stringifyConfig(config));
     } catch (error) {
-      void toastFrontendError(`Failed to update MCP server: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Failed to update MCP server")}: ${error.message || error}`, tr("MCP Servers"));
     }
   },
 
@@ -956,7 +969,7 @@ const model = {
       const config = this.getConfigObject();
       const ref = this.getServerConfigRef(config, serverName);
       if (!ref?.server) {
-        void toastFrontendWarning("Add this inherited server to the current config before changing its tools.", "MCP Servers");
+        void toastFrontendWarning(tr("Add this inherited server to the current config before changing its tools."), tr("MCP Servers"));
         return;
       }
 
@@ -980,7 +993,7 @@ const model = {
         ));
       }
     } catch (error) {
-      void toastFrontendError(`Failed to update MCP tool: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Failed to update MCP tool")}: ${error.message || error}`, tr("MCP Servers"));
     }
   },
 
@@ -999,12 +1012,12 @@ const model = {
         this.servers = resp.status || [];
         this.servers.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
       } else if (!options.silent) {
-        void toastFrontendWarning(resp?.error || "Unable to load MCP status", "MCP Servers");
+        void toastFrontendWarning(resp?.error || tr("Unable to load MCP status"), tr("MCP Servers"));
       }
     } catch (error) {
       if (!options.silent) {
         console.error("Failed to load MCP status:", error);
-        void toastFrontendError("Failed to load MCP status", "MCP Servers");
+        void toastFrontendError(tr("Failed to load MCP status"), tr("MCP Servers"));
       }
     }
   },
@@ -1019,19 +1032,19 @@ const model = {
       const formatted = stringifyConfig(this.getConfigObject());
       this.setEditorValue(formatted);
     } catch (error) {
-      void toastFrontendError(`Invalid JSON: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Invalid JSON")}: ${error.message || error}`, tr("MCP Servers"));
       return;
     }
 
     this.applying = true;
     try {
       const resp = await API.callJsonApi("mcp_servers_apply", this.getApplyPayload());
-      if (!resp?.success) throw new Error(resp?.error || "Apply failed");
+      if (!resp?.success) throw new Error(resp?.error || tr("Apply failed"));
       this.setScopeConfigJson(resp.mcp_servers || this.getEditorValue());
       this.servers = resp.status || [];
       this.servers.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
       if (options.successMessage !== false) {
-        void toastFrontendSuccess(options.successMessage || "MCP servers applied", "MCP Servers");
+        void toastFrontendSuccess(tr(options.successMessage || "MCP servers applied"), tr("MCP Servers"));
       }
       await sleep(100);
       if (options.scrollToStatus !== false && globalThis.scrollModal) {
@@ -1039,7 +1052,7 @@ const model = {
       }
     } catch (error) {
       console.error("Failed to apply MCP servers:", error);
-      void toastFrontendError(`Failed to apply MCP servers: ${error.message || error}`, "MCP Servers");
+      void toastFrontendError(`${tr("Failed to apply MCP servers")}: ${error.message || error}`, tr("MCP Servers"));
     } finally {
       this.applying = false;
     }
@@ -1066,10 +1079,10 @@ const model = {
   },
 
   statusLabel(server) {
-    if (!server.connected) return "Unavailable";
-    if (server.error) return "Needs attention";
-    if ((server.tool_count || 0) > 0) return "Ready";
-    return "Connected";
+    if (!server.connected) return tr("Unavailable");
+    if (server.error) return tr("Needs attention");
+    if ((server.tool_count || 0) > 0) return tr("Ready");
+    return tr("Connected");
   },
 
   statusClass(server) {
@@ -1079,9 +1092,9 @@ const model = {
   },
 
   configModeLabel(config) {
-    if (config?.disabled) return "Disabled";
-    if (config?.url || config?.serverUrl) return "Remote";
-    return "Local";
+    if (config?.disabled) return tr("Disabled");
+    if (config?.url || config?.serverUrl) return tr("Remote");
+    return tr("Local");
   },
 
   configSummary(config) {
@@ -1096,9 +1109,9 @@ const model = {
 
   get scanRiskLabel() {
     const risk = this.scanResult?.risk_level || "";
-    if (risk === "ok") return "No major issues found";
-    if (risk === "warning") return "Review warnings";
-    if (risk === "error") return "Action needed";
+    if (risk === "ok") return tr("No major issues found");
+    if (risk === "warning") return tr("Review warnings");
+    if (risk === "error") return tr("Action needed");
     return "";
   },
 

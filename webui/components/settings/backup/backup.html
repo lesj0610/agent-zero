@@ -38,7 +38,7 @@
 
                 <!-- Loading indicator -->
                 <div x-show="$store.backupStore.loading" class="backup-loading">
-                    <span x-text="$store.backupStore.loadingMessage || 'Processing...'"></span>
+                    <span x-text="$store.settings.localizeText($store.backupStore.loadingMessage || 'Processing...')"></span>
                 </div>
 
                 <!-- Error display -->

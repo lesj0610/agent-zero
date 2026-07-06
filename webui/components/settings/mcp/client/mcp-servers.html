@@ -16,7 +16,7 @@
                     <div class="mcp-manager-heading">
                         <div class="mcp-manager-title-row">
                             <h2 x-text="$store.mcpServersStore.scopeTitle"></h2>
-                            <span class="mcp-scope-pill" x-text="$store.mcpServersStore.scope === 'project' ? 'Project' : 'Global'"></span>
+                            <span class="mcp-scope-pill" x-text="$store.mcpServersStore.localizeText($store.mcpServersStore.scope === 'project' ? 'Project' : 'Global')"></span>
                         </div>
                         <p x-text="$store.mcpServersStore.scopeSubtitle"></p>
 
@@ -53,7 +53,7 @@
                         </button>
                         <button type="button" class="button confirm" :disabled="$store.mcpServersStore.applying" @click="$store.mcpServersStore.applyNow()">
                             <span class="material-symbols-outlined" aria-hidden="true">check</span>
-                            <span x-text="$store.mcpServersStore.applying ? 'Applying' : 'Apply'"></span>
+                            <span x-text="$store.mcpServersStore.localizeText($store.mcpServersStore.applying ? 'Applying' : 'Apply')"></span>
                         </button>
                     </div>
                 </header>
@@ -85,14 +85,14 @@
                                     </button>
                                     <div class="mcp-toggle-group">
                                         <label class="toggle plugin-status-toggle mcp-status-toggle"
-                                            :title="entry.config.disabled ? 'Enable MCP server' : 'Disable MCP server'">
+                                            :title="$store.mcpServersStore.localizeText(entry.config.disabled ? 'Enable MCP server' : 'Disable MCP server')">
                                             <input type="checkbox"
                                                 :checked="!entry.config.disabled"
                                                 @change="$store.mcpServersStore.toggleConfigServer(entry.name)"
                                                 @click.stop>
                                             <span class="toggler"></span>
                                         </label>
-                                        <span class="plugin-status-text" x-text="entry.config.disabled ? 'OFF' : 'ON'"></span>
+                                        <span class="plugin-status-text" x-text="$store.mcpServersStore.localizeText(entry.config.disabled ? 'OFF' : 'ON')"></span>
                                     </div>
                                     <button type="button" class="mcp-icon-button" title="Remove"
                                         :disabled="$store.mcpServersStore.applying"
@@ -122,7 +122,7 @@
                                         <div>
                                             <div class="mcp-status-name">
                                                 <span x-text="server.name"></span>
-                                                <span class="mcp-status-scope" x-text="server.scope || 'global'"></span>
+                                                <span class="mcp-status-scope" x-text="$store.mcpServersStore.localizeText(server.scope || 'global')"></span>
                                             </div>
                                             <div class="mcp-status-meta">
                                                 <span x-text="$store.mcpServersStore.statusLabel(server)"></span>
@@ -133,9 +133,9 @@
                                     <div class="mcp-status-actions">
                                         <button type="button" class="button" x-show="server.tool_count > 0"
                                             @click="$store.mcpServersStore.onToolCountClick(server.name)"
-                                            x-text="server.tool_count + ' tools'"></button>
+                                            x-text="$store.mcpServersStore.toolCountLabel(server.tool_count)"></button>
                                         <button type="button" class="button" x-show="server.has_log"
-                                            @click="$store.mcpServersStore.getServerLog(server.name)">Log</button>
+                                            @click="$store.mcpServersStore.getServerLog(server.name)" x-text="$store.mcpServersStore.localizeText('Log')"></button>
                                     </div>
                                     <div class="mcp-status-error" x-show="server.error" x-text="server.error"></div>
                                 </article>
@@ -267,7 +267,7 @@
                             </button>
                             <button type="button" class="button confirm" :disabled="$store.mcpServersStore.applying" @click="$store.mcpServersStore.applyNow()">
                                 <span class="material-symbols-outlined" aria-hidden="true">check</span>
-                                <span x-text="$store.mcpServersStore.applying ? 'Applying' : 'Apply'"></span>
+                                <span x-text="$store.mcpServersStore.localizeText($store.mcpServersStore.applying ? 'Applying' : 'Apply')"></span>
                             </button>
                         </div>
                     </div>

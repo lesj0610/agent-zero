@@ -139,9 +139,9 @@
                   <div class="summary-value" x-text="$store.selfUpdateStore.currentVersion"></div>
                   <div class="summary-meta">
                     Commit
-                    <code x-text="$store.selfUpdateStore.info?.current?.short_commit || 'unknown'"></code>
+                    <code x-text="$store.selfUpdateStore.info?.current?.short_commit || $store.selfUpdateStore.localizeText('unknown')"></code>
                   </div>
-                  <div class="summary-meta" x-text="`Branch ${$store.selfUpdateStore.currentBranch || 'unknown'}`"></div>
+                  <div class="summary-meta" x-text="$store.selfUpdateStore.branchSummary($store.selfUpdateStore.currentBranch)"></div>
                   <template x-if="$store.selfUpdateStore.info?.current?.describe && $store.selfUpdateStore.info?.current?.describe !== $store.selfUpdateStore.info?.current?.short_tag">
                     <div
                       class="summary-meta"
@@ -154,7 +154,7 @@
                   <div class="summary-label">Latest version</div>
                   <div
                     class="summary-value"
-                    x-text="$store.selfUpdateStore.info?.current_branch_latest?.display_version || 'Unavailable'"
+                    x-text="$store.selfUpdateStore.info?.current_branch_latest?.display_version || $store.selfUpdateStore.localizeText('Unavailable')"
                   ></div>
                   <template x-if="$store.selfUpdateStore.info?.current_branch_latest?.short_commit && $store.selfUpdateStore.info?.current_branch_latest?.branch !== 'main'">
                     <div class="summary-meta">
@@ -164,7 +164,7 @@
                   </template>
                   <div
                     class="summary-meta"
-                    x-text="`Branch ${$store.selfUpdateStore.info?.current_branch_latest?.branch || $store.selfUpdateStore.currentBranch || 'unknown'}`"
+                    x-text="$store.selfUpdateStore.branchSummary($store.selfUpdateStore.info?.current_branch_latest?.branch || $store.selfUpdateStore.currentBranch)"
                   ></div>
                   <template x-if="$store.selfUpdateStore.info?.current_branch_latest?.describe && $store.selfUpdateStore.info?.current_branch_latest?.describe !== $store.selfUpdateStore.info?.current_branch_latest?.short_tag">
                     <div
@@ -465,8 +465,8 @@
           <div class="self-update-progress-state" x-show="$store.selfUpdateStore.restarting">
             <div class="self-update-progress-spinner"></div>
             <div>
-              <div class="self-update-progress-title" x-text="$store.selfUpdateStore.restartStatusText || 'Update in progress'"></div>
-              <div class="self-update-progress-copy" x-text="$store.selfUpdateStore.restartDetailText || 'Waiting for Agent Zero to restart and become healthy again.'"></div>
+              <div class="self-update-progress-title" x-text="$store.selfUpdateStore.restartStatusText || $store.selfUpdateStore.localizeText('Update in progress')"></div>
+              <div class="self-update-progress-copy" x-text="$store.selfUpdateStore.restartDetailText || $store.selfUpdateStore.localizeText('Waiting for Agent Zero to restart and become healthy again.')"></div>
             </div>
           </div>
 

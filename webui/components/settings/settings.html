@@ -15,20 +15,20 @@
       <!-- Loading state -->
       <div x-show="$store.settings.isLoading && !$store.settings.settings" class="settings-loading">
         <span class="material-symbols-outlined spinning">progress_activity</span>
-        <span>Loading settings...</span>
+        <span data-i18n="settings.loading">Loading settings...</span>
       </div>
 
       <!-- Error state -->
       <div x-show="$store.settings.error && !$store.settings.settings" class="settings-error">
         <span class="material-symbols-outlined">error</span>
         <span x-text="$store.settings.error"></span>
-        <button class="btn btn-retry" @click="$store.settings.onOpen()">Retry</button>
+        <button class="btn btn-retry" @click="$store.settings.onOpen()" data-i18n="settings.retry">Retry</button>
       </div>
 
       <!-- Settings content -->
       <div x-show="$store.settings.settings" class="settings-content">
         <!-- Tab Navigation -->
-        <aside class="settings-tabs-container" aria-label="Settings categories">
+        <aside class="settings-tabs-container" aria-label="Settings categories" data-i18n-aria-label="settings.categories">
           <div class="settings-search" role="search">
             <span class="material-symbols-outlined" aria-hidden="true">search</span>
             <input
@@ -37,6 +37,8 @@
               @keydown.enter.prevent="$store.settings.openFirstSearchResult()"
               placeholder="Search"
               aria-label="Search settings"
+              data-i18n-placeholder="settings.search"
+              data-i18n-aria-label="settings.searchSettings"
               autocomplete="off"
             />
             <button
@@ -45,6 +47,7 @@
               x-show="$store.settings.hasSearchQuery"
               @click="$store.settings.clearSearch()"
               aria-label="Clear search"
+              data-i18n-aria-label="settings.clearSearch"
             >
               <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
@@ -101,7 +104,7 @@
               </div>
             </template>
             <div class="settings-search-empty" x-show="$store.settings.hasSearchQuery && !$store.settings.filteredNavItems.length">
-              No settings found
+              <span data-i18n="settings.noResults">No settings found</span>
             </div>
           </div>
         </aside>
@@ -134,11 +137,11 @@
         <button class="btn btn-ok" 
             @click="$store.settings.saveAndClose()"
             :disabled="$store.settings?.isLoading">
-        Save
+        <span data-i18n="settings.save">Save</span>
         </button>
         <button class="btn btn-cancel" 
                 @click="$store.settings.closeSettings()">
-          Cancel
+          <span data-i18n="settings.cancel">Cancel</span>
         </button>
       </div>
 

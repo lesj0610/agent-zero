@@ -1,12 +1,17 @@
 // Import a component into a target element
 // Import a component and recursively load its nested components
 // Returns the parsed document for additional processing
+import { applyTranslations } from "/js/i18n/index.js";
 
 // cache object to store loaded components
 const componentCache = {};
 
 // Lock map to prevent multiple simultaneous imports of the same component
 const importLocks = new Map();
+
+function isSettingsComponent(componentUrl) {
+  return componentUrl.startsWith("components/settings/") || componentUrl.startsWith("/components/settings/");
+}
 
 export async function importComponent(path, targetElement) {
   // Create a unique key for this import based on the target element
@@ -31,6 +36,9 @@ export async function importComponent(path, targetElement) {
 
     // full component url
     const componentUrl = path.startsWith("/") ? path : (path.startsWith("components/") ? path : "components/" + path);
+    if (isSettingsComponent(componentUrl)) {
+      targetElement.setAttribute("data-i18n-scope", "settings");
+    }
 
     // get html from cache or fetch it
     let html;
@@ -175,6 +183,8 @@ export async function importComponent(path, targetElement) {
     if (loadingEl) {
       targetElement.removeChild(loadingEl);
     }
+
+    applyTranslations(targetElement);
 
     // // Load any nested components
     // await loadComponents([targetElement]);
