@@ -5,7 +5,7 @@ import { store as projectsStore } from "/components/projects/projects-store.js";
 import { store as fileBrowserStore } from "/components/modals/file-browser/file-browser-store.js";
 import * as API from "/js/api.js";
 import { getCurrentUserISOString } from "/js/time-utils.js";
-import { getCurrentLocale, t } from "/js/i18n/index.js";
+import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";
 
 const model = {
   // State
@@ -161,9 +161,55 @@ const model = {
     return this.banners.find((b) => b.id === "system-resources") || null;
   },
 
+  get systemResourceTitle() {
+    this.uiLocale;
+    return translateStaticText(this.systemResourceBanner?.title || "System Resources");
+  },
+
+  get systemResourceHtml() {
+    this.uiLocale;
+    return this.localizeSystemResourceHtml(this.systemResourceBanner?.html || "");
+  },
+
   get heroSubtitle() {
     this.uiLocale;
     return t("welcome.subtitle", "How can I help you today?");
+  },
+
+  localizeSystemResourceHtml(html) {
+    if (!html || typeof document === "undefined") return html || "";
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    for (const el of template.content.querySelectorAll(".system-resource-name")) {
+      const original = el.textContent || "";
+      el.textContent = translateStaticText(original);
+    }
+
+    for (const valueEl of template.content.querySelectorAll(".system-resource-value")) {
+      const original = valueEl.textContent || "";
+      valueEl.textContent = original.replace(/\((\d+) cores\)/, (_, count) => {
+        return `(${count} ${translateStaticText("cores")})`;
+      });
+    }
+
+    for (const detail of template.content.querySelectorAll(".system-resource-detail")) {
+      const titleEl = detail.querySelector(".system-resource-detail-title");
+      const valueEl = detail.querySelector(".system-resource-detail-value");
+      const originalTitle = titleEl?.textContent || "";
+      if (titleEl) {
+        titleEl.textContent = translateStaticText(originalTitle);
+      }
+      if (originalTitle === "Net (since boot)" && valueEl) {
+        const match = (valueEl.textContent || "").match(/^(.+?) sent \/ (.+?) recv$/);
+        if (match) {
+          valueEl.textContent = `${match[1]} ${translateStaticText("sent")} / ${match[2]} ${translateStaticText("recv")}`;
+        }
+      }
+    }
+
+    return template.innerHTML;
   },
 
   executeBannerAction(action) {

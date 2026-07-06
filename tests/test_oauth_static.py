@@ -199,6 +199,14 @@ def test_oauth_discovery_card_renders_in_welcome_account_panel():
     assert "account_chips" in discovery_cards
     assert "discovery-account-card" in welcome_cards
     assert "discovery-account-chip" in welcome_cards
+    assert "$store.discoveryStore.cardTitle(card)" in welcome_cards
+    assert "$store.discoveryStore.cardDescription(card)" in welcome_cards
+    assert "$store.discoveryStore.cardCtaText(card)" in welcome_cards
+    assert "$store.discoveryStore.chipDetail(chip)" in welcome_cards
+    assert "cardTitle(card)" in discovery_store
+    assert "cardDescription(card)" in discovery_store
+    assert "cardCtaText(card)" in discovery_store
+    assert "chipDetail(chip)" in discovery_store
     assert "discovery-account-icon" not in welcome_cards
     assert ".discovery-account-chip {\n            display: inline-grid;" in welcome_cards
     assert "            border-radius: 8px;" in welcome_cards

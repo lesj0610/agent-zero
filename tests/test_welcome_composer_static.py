@@ -46,6 +46,12 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "refreshBanners(true)" in welcome
     assert 'aria-label="Dismiss System Resources"' in welcome
     assert "dismissBanner($store.welcomeStore.systemResourceBanner?.id || 'system-resources')" in welcome
+    assert "x-text=\"$store.welcomeStore.systemResourceTitle\"" in welcome
+    assert "x-html=\"$store.welcomeStore.systemResourceHtml\"" in welcome
+    assert "get systemResourceTitle()" in welcome_store
+    assert "get systemResourceHtml()" in welcome_store
+    assert "localizeSystemResourceHtml(html)" in welcome_store
+    assert "translateStaticText(originalTitle)" in welcome_store
     assert "welcome-panel-status-icon" not in welcome
     assert "monitoring" not in welcome
     assert ".welcome-banner {\n            --welcome-banner-accent: #2f6bff;" in welcome
@@ -67,7 +73,14 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "dismissFeatureCards()" in discovery_cards
     assert "dismissFeatureCards() {" in discovery_store
     assert 'class="discovery-feature-card"\n                                type="button"' in discovery_cards
-    assert "`${card.cta_text || 'Connect'} ${card.title}`" in discovery_cards
+    assert "$store.discoveryStore.featureCardTitle(card)" in discovery_cards
+    assert "featureCardTitle(card)" in discovery_store
+    assert "$store.discoveryStore.cardTitle(card)" in discovery_cards
+    assert "$store.discoveryStore.cardDescription(card)" in discovery_cards
+    assert "$store.discoveryStore.cardCtaText(card)" in discovery_cards
+    assert "$store.discoveryStore.chipDetail(chip)" in discovery_cards
+    assert "$store.discoveryStore.resetText(window)" in discovery_cards
+    assert "`${card.cta_text || 'Connect'} ${card.title}`" not in discovery_cards
     assert "discovery-feature-card > .btn" not in discovery_cards
     assert "discovery-feature-head" not in discovery_cards
     assert "discovery-account-header" in discovery_cards
@@ -77,7 +90,7 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
 
     assert "x-if=\"$store.welcomeStore && $store.welcomeStore.isVisible\"" in index
     assert "x-if=\"!$store.welcomeStore || !$store.welcomeStore.isVisible\"" in index
-    assert "Connect Channels" in discovery_cards
+    assert 'data-i18n="welcome.connectChannels">Connect Channels' in discovery_cards
     assert "oauthAccountCards" in discovery_cards
     assert "discovery-account-card" in discovery_cards
     assert "topHeroCards" not in discovery_cards

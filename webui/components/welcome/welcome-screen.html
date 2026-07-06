@@ -142,7 +142,7 @@
                                  x-show="$store.welcomeStore.systemResourceBanner"
                                  x-transition.opacity>
                             <header class="welcome-panel-header">
-                                <h2 x-text="$store.welcomeStore.systemResourceBanner?.title || 'System Resources'"></h2>
+                                <h2 x-text="$store.welcomeStore.systemResourceTitle"></h2>
                                 <div class="welcome-panel-actions">
                                     <button class="welcome-panel-icon-button"
                                             type="button"
@@ -167,7 +167,7 @@
                                 </div>
                             </header>
                             <div class="welcome-system-body"
-                                 x-html="$store.welcomeStore.systemResourceBanner?.html || ''"></div>
+                                 x-html="$store.welcomeStore.systemResourceHtml"></div>
                         </article>
                     </section>
                 </main>

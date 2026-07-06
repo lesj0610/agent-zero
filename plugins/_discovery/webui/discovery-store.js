@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import { toastFrontendError } from "/components/notifications/notification-store.js";
 import { store as pluginListStore } from "/components/plugins/list/pluginListStore.js";
+import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";
 import * as API from "/js/api.js";
 
 const STORAGE_KEY = "dismissed_discovery_cards";
@@ -12,11 +13,19 @@ const model = {
   hasDismissedCards: false,
   _initialized: false,
   _isLoading: false,
+  _localeChangeHandler: null,
+  uiLocale: getCurrentLocale(),
 
   // --- Lifecycle ---
   init() {
     if (this._initialized) return;
     this._initialized = true;
+    if (!this._localeChangeHandler) {
+      this._localeChangeHandler = (event) => {
+        this.uiLocale = event?.detail?.locale || getCurrentLocale();
+      };
+      document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+    }
   },
 
   // --- Actions ---
@@ -133,7 +142,9 @@ const model = {
   formatRemainingPercent(window) {
     const number = this.remainingPercent(window);
     if (!Number.isFinite(number)) return "0%";
-    return `${Math.round(number * 10) / 10}% left`;
+    const percent = `${Math.round(number * 10) / 10}%`;
+    this.uiLocale;
+    return t("welcome.percentLeft", "{percent} left", { percent });
   },
 
   formatReset(window) {
@@ -145,6 +156,49 @@ const model = {
     const hours = Math.round(minutes / 60);
     if (hours < 48) return `${hours}h`;
     return `${Math.round(hours / 24)}d`;
+  },
+
+  localizeText(value = "") {
+    this.uiLocale;
+    return translateStaticText(value);
+  },
+
+  cardTitle(card) {
+    return this.localizeText(card?.title || "");
+  },
+
+  cardDescription(card) {
+    return this.localizeText(card?.description || "");
+  },
+
+  cardCtaText(card) {
+    return this.localizeText(card?.cta_text || "");
+  },
+
+  featureCardTitle(card) {
+    const fallback = `${card?.cta_text || "Connect"} ${card?.title || ""}`.trim();
+    return this.localizeText(fallback);
+  },
+
+  cardDismissLabel(card) {
+    return t("welcome.dismissCard", "Dismiss {title}", {
+      title: this.cardTitle(card),
+    });
+  },
+
+  chipDetail(chip) {
+    return this.localizeText(chip?.detail || "");
+  },
+
+  usageWindowTitle(window) {
+    return this.localizeText(window?.title || "");
+  },
+
+  resetText(window) {
+    const reset = this.formatReset(window);
+    if (!reset) return "";
+    this.uiLocale;
+    return t("welcome.resetsIn", "Resets in {time}", { time: reset });
   },
 
   // --- Helpers (Private-ish) ---

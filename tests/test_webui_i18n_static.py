@@ -93,6 +93,7 @@ def test_common_webui_surfaces_have_i18n_keys_with_english_fallbacks() -> None:
         "index": _read("webui/index.html"),
         "settings": _read("webui/components/settings/settings.html"),
         "welcome": _read("webui/components/welcome/welcome-screen.html"),
+        "discovery": _read("plugins/_discovery/extensions/webui/welcome-actions-end/discovery-cards.html"),
         "chat_input": _read("webui/components/chat/input/chat-bar-input.html"),
         "sidebar": _read("webui/components/sidebar/top-section/header-icons.html"),
         "preferences": _read("webui/components/sidebar/bottom/preferences/preferences-panel.html"),
@@ -101,6 +102,7 @@ def test_common_webui_surfaces_have_i18n_keys_with_english_fallbacks() -> None:
     assert 'data-i18n-title="app.scroll.top"' in surfaces["index"]
     assert 'data-i18n-placeholder="settings.search"' in surfaces["settings"]
     assert 'data-i18n="welcome.title">Hello! I\'m Agent Zero' in surfaces["welcome"]
+    assert 'data-i18n="welcome.connectChannels">Connect Channels' in surfaces["discovery"]
     assert 'data-i18n-aria-label="chat.moreActions"' in surfaces["chat_input"]
     assert 'data-i18n="sidebar.navigation">Navigation' in surfaces["sidebar"]
     assert 'data-i18n="preferences.title">Preferences' in surfaces["preferences"]
@@ -116,6 +118,8 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
     whisper_panel = _read("plugins/_whisper_stt/webui/main.html")
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
+    welcome_store = _read("webui/components/welcome/welcome-store.js")
+    discovery_store = _read("plugins/_discovery/webui/discovery-store.js")
     ko_js = _read("webui/js/i18n/locales/ko.js")
 
     assert 'this.localizeText("Remote Control")' in tunnel_store
@@ -139,6 +143,10 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'x-text="$store.whisperStt.enabledText"' in whisper_panel
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
     assert "title: translateStaticText('Main')" in model_config_store
+    assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in welcome_store
+    assert "localizeSystemResourceHtml(html)" in welcome_store
+    assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in discovery_store
+    assert "featureCardTitle(card)" in discovery_store
     assert '"LiteLLM Global Settings": "LiteLLM 전역 설정"' in ko_js
     assert '"This browser\'s Agent Zero WebUI language.": "이 브라우저에서 사용할 Agent Zero WebUI 언어입니다."' in ko_js
     assert '"Conflict policy:": "충돌 정책:"' in ko_js
@@ -154,3 +162,6 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"Yes": "예"' in ko_js
     assert '"No": "아니요"' in ko_js
     assert '"Request Mic Permission": "마이크 권한 요청"' in ko_js
+    assert '"Your AI accounts": "AI 계정"' in ko_js
+    assert '"System Resources": "시스템 리소스"' in ko_js
+    assert '"welcome.connectChannels": "채널 연결"' in ko_js

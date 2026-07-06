@@ -12,15 +12,17 @@
             <section class="discovery-features-panel" x-show="$store.discoveryStore.featureCards.length > 0">
                 <header class="discovery-panel-header">
                     <div class="discovery-panel-copy">
-                        <h2>Connect Channels</h2>
-                        <p>Extend Agent Zero across your favorite platforms.</p>
+                        <h2 data-i18n="welcome.connectChannels">Connect Channels</h2>
+                        <p data-i18n="welcome.connectChannelsDescription">Extend Agent Zero across your favorite platforms.</p>
                     </div>
                     <button class="discovery-dismiss discovery-panel-dismiss"
                             type="button"
                             x-show="$store.discoveryStore.featureCards.some(card => card.dismissible !== false)"
                             @click.stop="$store.discoveryStore.dismissFeatureCards()"
                             aria-label="Dismiss Connect Channels"
-                            title="Dismiss">
+                            title="Dismiss"
+                            data-i18n-aria-label="welcome.dismissConnectChannels"
+                            data-i18n-title="welcome.dismiss">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </header>
@@ -32,13 +34,13 @@
                                 @click="$store.discoveryStore.executeCta(card.cta_action)">
                             <span class="discovery-feature-thumb">
                                 <template x-if="card.thumbnail">
-                                    <img :src="card.thumbnail" :alt="card.title" loading="lazy">
+                                    <img :src="card.thumbnail" :alt="$store.discoveryStore.cardTitle(card)" loading="lazy">
                                 </template>
                                 <template x-if="!card.thumbnail && card.icon">
                                     <span class="material-symbols-outlined discovery-feature-icon" x-text="card.icon"></span>
                                 </template>
                             </span>
-                            <span class="discovery-feature-title" x-text="`${card.cta_text || 'Connect'} ${card.title}`"></span>
+                            <span class="discovery-feature-title" x-text="$store.discoveryStore.featureCardTitle(card)"></span>
                         </button>
                     </template>
                 </div>
@@ -50,20 +52,20 @@
                             type="button"
                             x-show="card.dismissible"
                             @click.stop="$store.discoveryStore.dismissCard(card.id)"
-                            :aria-label="`Dismiss ${card.title}`"
-                            title="Dismiss">
+                            :aria-label="$store.discoveryStore.cardDismissLabel(card)"
+                            :title="$store.discoveryStore.localizeText('Dismiss')">
                         <span class="material-symbols-outlined">close</span>
                     </button>
 
                     <header class="discovery-account-header">
                         <div class="discovery-account-copy">
-                            <h2 x-text="card.title"></h2>
-                            <p x-show="card.description" x-text="card.description"></p>
+                            <h2 x-text="$store.discoveryStore.cardTitle(card)"></h2>
+                            <p x-show="card.description" x-text="$store.discoveryStore.cardDescription(card)"></p>
                         </div>
                         <button class="btn btn primary discovery-account-cta"
                                 type="button"
                                 @click="$store.discoveryStore.executeCta(card.cta_action)">
-                            <span x-text="card.cta_text"></span>
+                            <span x-text="$store.discoveryStore.cardCtaText(card)"></span>
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
                     </header>
@@ -73,7 +75,7 @@
                             <span class="discovery-account-chip" :class="{ 'is-connected': chip.connected }">
                                 <span class="discovery-account-chip-dot" aria-hidden="true"></span>
                                 <span class="discovery-account-chip-label" x-text="chip.label"></span>
-                                <span class="discovery-account-chip-detail" x-show="chip.detail" x-text="chip.detail"></span>
+                                <span class="discovery-account-chip-detail" x-show="chip.detail" x-text="$store.discoveryStore.chipDetail(chip)"></span>
                             </span>
                         </template>
                     </div>
@@ -82,9 +84,9 @@
                         <template x-for="window in card.usage_windows || []" :key="window.key || window.title">
                             <div class="discovery-account-usage-row">
                                 <div class="discovery-account-usage-label">
-                                    <span x-text="window.title"></span>
+                                    <span x-text="$store.discoveryStore.usageWindowTitle(window)"></span>
                                     <small x-show="$store.discoveryStore.formatReset(window)"
-                                           x-text="`Resets in ${$store.discoveryStore.formatReset(window)}`"></small>
+                                           x-text="$store.discoveryStore.resetText(window)"></small>
                                 </div>
                                 <div class="discovery-account-usage-meter">
                                     <span class="discovery-account-usage-track">
@@ -106,7 +108,7 @@
                         class="discovery-undismiss-btn"
                         @click="$store.discoveryStore.undismissCards()">
                     <span class="material-symbols-outlined">undo</span>
-                    <span>Show dismissed suggestions</span>
+                    <span data-i18n="welcome.showDismissedSuggestions">Show dismissed suggestions</span>
                 </button>
             </div>
         </div>
