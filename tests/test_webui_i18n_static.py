@@ -52,6 +52,7 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert 'targetElement.setAttribute("data-i18n-scope", "settings")' in components_js
     assert 'targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")' in extensions_js
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in modals_js
+    assert "if (!modal.title.textContent.trim())" in modals_js
     assert "modal.title.textContent = translateStaticText(doc.title || modalPath);" in modals_js
     assert 'import ko from "./ko.js";' in locale_index_js
     assert "ko," in locale_index_js
@@ -195,12 +196,18 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
 def test_model_config_summary_routes_keep_their_modal_contracts() -> None:
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
     model_config_html = _read("plugins/_model_config/webui/config.html")
+    plugin_settings_html = _read("webui/components/plugins/plugin-settings.html")
     i18n_js = _read("webui/js/i18n/index.js")
+    modals_js = _read("webui/js/modals.js")
 
     assert "pluginSettingsStore.openConfig('_model_config', '', '', {" in model_config_store
     assert "title: translateStaticText('Model Configuration')" in model_config_store
     assert "pluginSettingsStore.openConfig('_model_config');" not in model_config_store
     assert "installSettingsHooks(context)" in model_config_html
+    assert "context.modalTitle || fallbackTitle" in plugin_settings_html
+    assert "globalThis.A0_I18N?.translateStaticText?.('Plugin Settings')" in plugin_settings_html
+    assert "Some modal components set a more specific title while mounting." in modals_js
+    assert "if (!modal.title.textContent.trim())" in modals_js
     assert "await window.openModal?.('/plugins/_model_config/webui/main.html')" in model_config_store
     assert "await window.openModal?.('/plugins/_model_config/webui/api-keys.html')" in model_config_store
     assert 'const STATIC_ATTRIBUTE_NAMES = ["title", "aria-label", "placeholder", "data-placeholder"];' in i18n_js

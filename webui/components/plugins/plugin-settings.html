@@ -22,7 +22,8 @@
                      if (modal) {
                          modal.__pluginSettingsContext = context;
                          const modalTitle = modal.querySelector('.modal-title');
-                         if (modalTitle) modalTitle.textContent = context.modalTitle || 'Plugin Settings';
+                         const fallbackTitle = globalThis.A0_I18N?.translateStaticText?.('Plugin Settings') || 'Plugin Settings';
+                         if (modalTitle) modalTitle.textContent = context.modalTitle || fallbackTitle;
                      }
                   })()"
                  x-destroy="context.cleanup()">
