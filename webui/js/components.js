@@ -17,6 +17,29 @@ function isInsideSettings(targetElement) {
   return Boolean(targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections"));
 }
 
+const translatableSelector = [
+  "[data-i18n-scope]",
+  "[data-i18n]",
+  "[data-i18n-title]",
+  "[data-i18n-aria-label]",
+  "[data-i18n-placeholder]",
+  "[data-i18n-alt]",
+  "[data-i18n-data-placeholder]",
+].join(",");
+
+function getTranslationRootForAddedNode(node) {
+  if (node.nodeType !== Node.ELEMENT_NODE) return null;
+
+  const scopedRoot = node.closest?.("[data-i18n-scope]");
+  if (scopedRoot) return scopedRoot;
+
+  if (node.matches?.(translatableSelector) || node.querySelector?.(translatableSelector)) {
+    return node;
+  }
+
+  return null;
+}
+
 export async function importComponent(path, targetElement) {
   // Create a unique key for this import based on the target element
   const lockKey = targetElement.id || targetElement.getAttribute('data-component-id') || targetElement;
@@ -275,6 +298,10 @@ const observer = new MutationObserver((mutations) => {
           importComponent(node.getAttribute("path"), node);
         } else if (node.querySelectorAll) {
           loadComponents([node]);
+        }
+        const translationRoot = getTranslationRootForAddedNode(node);
+        if (translationRoot) {
+          scheduleTranslations(translationRoot);
         }
       }
     }

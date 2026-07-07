@@ -48,6 +48,9 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert "if (!el.hasAttribute(fallbackAttr))" in i18n_js
     assert "function isSettingsComponent(componentUrl)" in components_js
     assert "function isInsideSettings(targetElement)" in components_js
+    assert "function getTranslationRootForAddedNode(node)" in components_js
+    assert 'node.closest?.("[data-i18n-scope]")' in components_js
+    assert "scheduleTranslations(translationRoot);" in components_js
     assert "isSettingsComponent(componentUrl) || isInsideSettings(targetElement)" in components_js
     assert 'targetElement.setAttribute("data-i18n-scope", "settings")' in components_js
     assert 'targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")' in extensions_js
