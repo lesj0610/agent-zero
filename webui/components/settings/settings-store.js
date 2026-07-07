@@ -310,16 +310,7 @@ const model = {
 
   scheduleSettingsTranslations() {
     const root = document.querySelector(".modal-inner.settings-modal") || document;
-    const retry = () => scheduleTranslations(root);
     scheduleTranslations(root);
-    if (typeof window === "undefined") return;
-    if (typeof window.requestAnimationFrame === "function") {
-      window.requestAnimationFrame(retry);
-      window.requestAnimationFrame(() => window.requestAnimationFrame(retry));
-    }
-    if (typeof window.setTimeout === "function") {
-      window.setTimeout(retry, 50);
-    }
   },
 
   get uiLanguageOptions() {

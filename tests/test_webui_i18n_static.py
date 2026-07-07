@@ -30,6 +30,10 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert 'globalThis.Alpine.store("i18n"' in i18n_js
     assert "function getReactiveLocale()" in i18n_js
     assert "export function scheduleTranslations" in i18n_js
+    assert "function registerAlpineTranslationHook()" in i18n_js
+    assert "globalThis.Alpine.interceptInit" in i18n_js
+    assert "function queueDynamicTranslations(root)" in i18n_js
+    assert "const pendingTranslationRoots = new Set();" in i18n_js
     assert "globalThis.Alpine.nextTick(reapply)" in i18n_js
     assert 'document.addEventListener("alpine:initialized", reapply' in i18n_js
     assert "window.addEventListener(\"load\", reapplyInitialLocale" in i18n_js
@@ -48,9 +52,8 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert "if (!el.hasAttribute(fallbackAttr))" in i18n_js
     assert "function isSettingsComponent(componentUrl)" in components_js
     assert "function isInsideSettings(targetElement)" in components_js
-    assert "function getTranslationRootForAddedNode(node)" in components_js
-    assert 'node.closest?.("[data-i18n-scope]")' in components_js
-    assert "scheduleTranslations(translationRoot);" in components_js
+    assert "function getTranslationRootForAddedNode(node)" not in components_js
+    assert "scheduleTranslations(translationRoot);" not in components_js
     assert "isSettingsComponent(componentUrl) || isInsideSettings(targetElement)" in components_js
     assert 'targetElement.setAttribute("data-i18n-scope", "settings")' in components_js
     assert 'targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")' in extensions_js
@@ -81,8 +84,8 @@ def test_settings_locale_section_exposes_ui_language_choice() -> None:
     assert "bindUiLocaleRuntime()" in store
     assert "scheduleSettingsTranslations()" in store
     assert "scheduleTranslations(root);" in store
-    assert "window.requestAnimationFrame(retry)" in store
-    assert "window.setTimeout(retry, 50)" in store
+    assert "window.requestAnimationFrame(retry)" not in store
+    assert "window.setTimeout(retry, 50)" not in store
     assert "getLocalePreference()" in store
     assert "getLocaleOptions()" in store
     assert 'data-i18n="settings.locale.uiLanguage"' in locale

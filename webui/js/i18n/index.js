@@ -2,6 +2,15 @@ import { DEFAULT_LOCALE, LOCALES } from "./locales/index.js";
 
 const LOCALE_STORAGE_KEY = "a0:webui-locale";
 const STATIC_ATTRIBUTE_NAMES = ["title", "aria-label", "placeholder", "data-placeholder"];
+const TRANSLATABLE_SELECTOR = [
+  "[data-i18n-scope]",
+  "[data-i18n]",
+  "[data-i18n-title]",
+  "[data-i18n-aria-label]",
+  "[data-i18n-placeholder]",
+  "[data-i18n-alt]",
+  "[data-i18n-data-placeholder]",
+].join(",");
 const STATIC_SKIP_SELECTOR = [
   "script",
   "style",
@@ -18,6 +27,9 @@ const reactiveLocaleState = {
   locale: DEFAULT_LOCALE,
   preference: DEFAULT_LOCALE,
 };
+const pendingTranslationRoots = new Set();
+let dynamicTranslationFlushQueued = false;
+let alpineTranslationHookRegistered = false;
 
 function normalizeLocale(locale) {
   const code = String(locale || "").toLowerCase().replaceAll("_", "-");
@@ -72,6 +84,59 @@ function registerI18nStore() {
   };
 
   if (globalThis.Alpine) {
+    register();
+  } else {
+    document.addEventListener("alpine:init", register, { once: true });
+  }
+}
+
+function getElementNodeType() {
+  return globalThis.Node?.ELEMENT_NODE ?? 1;
+}
+
+function getDynamicTranslationRoot(node) {
+  if (!node || node.nodeType !== getElementNodeType()) return null;
+  const hasTranslationTarget =
+    node.matches?.(TRANSLATABLE_SELECTOR) || node.querySelector?.(TRANSLATABLE_SELECTOR);
+  if (!hasTranslationTarget) return null;
+  return node.closest?.("[data-i18n-scope]") || node;
+}
+
+function flushDynamicTranslations() {
+  const roots = Array.from(pendingTranslationRoots);
+  pendingTranslationRoots.clear();
+  dynamicTranslationFlushQueued = false;
+
+  for (const root of roots) {
+    if (root === document || root.isConnected) {
+      scheduleTranslations(root);
+    }
+  }
+}
+
+function queueDynamicTranslations(root) {
+  if (!root) return;
+  pendingTranslationRoots.add(root);
+  if (dynamicTranslationFlushQueued) return;
+  dynamicTranslationFlushQueued = true;
+
+  if (typeof queueMicrotask === "function") {
+    queueMicrotask(flushDynamicTranslations);
+  } else {
+    Promise.resolve().then(flushDynamicTranslations);
+  }
+}
+
+function registerAlpineTranslationHook() {
+  const register = () => {
+    if (alpineTranslationHookRegistered || !globalThis.Alpine?.interceptInit) return;
+    alpineTranslationHookRegistered = true;
+    globalThis.Alpine.interceptInit((el) => {
+      queueDynamicTranslations(getDynamicTranslationRoot(el));
+    });
+  };
+
+  if (globalThis.Alpine?.interceptInit) {
     register();
   } else {
     document.addEventListener("alpine:init", register, { once: true });
@@ -302,6 +367,7 @@ export function initI18n() {
   const preference = getLocalePreference();
   setReactiveLocale(locale, preference);
   registerI18nStore();
+  registerAlpineTranslationHook();
   setDocumentLocale(locale);
   scheduleTranslations(document);
 
