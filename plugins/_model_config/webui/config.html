@@ -8,6 +8,7 @@
 
 <body>
   <div x-data
+       data-i18n-scope="settings"
        x-init="
          await $store.modelConfig.ensureLoaded();
          $store.modelConfig.resetApiKeyDrafts();
@@ -18,7 +19,7 @@
       <div class="model-config-sections">
 
         <!-- Model Sections (Main, Utility, Embedding) -->
-        <template x-for="section in $store.modelConfig.MODEL_SECTIONS" :key="section.key">
+        <template x-for="section in $store.modelConfig.getModelSections()" :key="section.key">
           <div class="model-section"
                x-data="{ get model() { return config[section.key]; }, modelType: section.key.replace('_model', ''), providers: $store.modelConfig.getProviders(section.key), searchType: $store.modelConfig.getSearchType(section.key), apiKeyMode: 'store' }">
             <div class="section-title" x-text="section.title"></div>

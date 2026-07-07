@@ -8,6 +8,7 @@
 
 <body>
   <div x-data
+       data-i18n-scope="settings"
        x-init="
          await $store.modelConfig.ensureLoaded();
          await $store.modelConfig.loadGlobalPresets();
@@ -27,7 +28,7 @@
               <span class="material-symbols-outlined preset-expand-icon"
                     :style="expanded ? 'transform:rotate(90deg)' : ''"
                     style="font-size:16px; transition:transform 0.15s ease;">chevron_right</span>
-              <span class="preset-card-name" x-text="preset.name || '(unnamed)'"></span>
+              <span class="preset-card-name" x-text="$store.modelConfig.presetDisplayName(preset)"></span>
               <span class="preset-card-summary" x-show="!expanded"
                     x-text="(preset.chat?.provider ? preset.chat.provider + '/' : '') + (preset.chat?.name || '')"></span>
               <button class="text-button preset-delete-btn"
@@ -44,7 +45,7 @@
                   <div class="field-description">Display name shown in the model switcher dropdown.</div>
                 </div>
                 <div class="field-control"><input type="text" x-model="preset.name" placeholder="e.g. GPT-4o, Claude Sonnet"
-                     @blur="if (!preset.name.trim()) preset.name = 'Preset ' + (idx + 1)" required /></div>
+                     @blur="if (!preset.name.trim()) preset.name = $store.modelConfig.defaultPresetName(idx + 1)" required /></div>
               </div>
 
               <div class="preset-subheader">Main Model</div>
@@ -64,7 +65,7 @@
           <button class="text-button preset-add-btn"
                   @click="
                     presets = [...presets, {
-                      name: 'Preset ' + (presets.length + 1),
+                      name: $store.modelConfig.defaultPresetName(presets.length + 1),
                       chat: { provider: '', name: '', api_key: '', api_base: '', kwargs: {}, _kwargs_text: '' },
                       utility: { provider: '', name: '', api_key: '', api_base: '', kwargs: {}, _kwargs_text: '' }
                     }]">

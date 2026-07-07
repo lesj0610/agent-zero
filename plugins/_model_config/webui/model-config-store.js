@@ -179,7 +179,36 @@ export const store = createStore("modelConfig", {
   // Switcher state (from mixin)
   ...switcherState,
 
-  init() {},
+  uiLocale: "",
+
+  init() {
+    this.uiLocale = globalThis.Alpine?.store?.("i18n")?.locale || "";
+    document.addEventListener("a0:locale-changed", (event) => {
+      this.uiLocale = event.detail?.locale || globalThis.Alpine?.store?.("i18n")?.locale || "";
+    });
+  },
+
+  localizeText(value = "") {
+    this.uiLocale;
+    return translateStaticText(value);
+  },
+
+  getModelSections() {
+    this.uiLocale;
+    return MODEL_SECTIONS.map(section => ({
+      ...section,
+      title: translateStaticText(section.title),
+      desc: translateStaticText(section.desc),
+    }));
+  },
+
+  presetDisplayName(preset) {
+    return preset?.name || this.localizeText("(unnamed)");
+  },
+
+  defaultPresetName(index) {
+    return `${this.localizeText("Preset")} ${index}`;
+  },
 
   // ── API Keys methods (from mixin) ──
   ...apiKeysMethods,

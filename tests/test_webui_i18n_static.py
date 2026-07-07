@@ -121,6 +121,16 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
     whisper_panel = _read("plugins/_whisper_stt/webui/main.html")
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
+    model_config = _read("plugins/_model_config/webui/config.html")
+    model_field = _read("plugins/_model_config/webui/model-field.html")
+    model_presets = _read("plugins/_model_config/webui/main.html")
+    model_api_keys = _read("plugins/_model_config/webui/api-keys.html")
+    model_summary = _read("plugins/_model_config/webui/models-summary.html")
+    model_switcher = _read("plugins/_model_config/extensions/webui/chat-input-progress-start/model-switcher.html")
+    switcher_store = _read("plugins/_model_config/webui/switcher-mixin.js")
+    agent_settings = _read("webui/components/settings/agent/agent-settings.html")
+    agent_config = _read("webui/components/settings/agent/agent.html")
+    agent_voice = _read("webui/components/settings/agent/voice.html")
     email_store = _read("plugins/_email_integration/webui/email-config-store.js")
     email_config = _read("plugins/_email_integration/webui/config.html")
     welcome_store = _read("webui/components/welcome/welcome-store.js")
@@ -147,7 +157,28 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'translateStaticText(this.enabled ? "Yes" : "No")' in whisper_store
     assert 'x-text="$store.whisperStt.enabledText"' in whisper_panel
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
+    assert "uiLocale: \"\"" in model_config_store
+    assert "getModelSections()" in model_config_store
+    assert "presetDisplayName(preset)" in model_config_store
+    assert "defaultPresetName(index)" in model_config_store
     assert "title: translateStaticText('Main')" in model_config_store
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in switcher_store
+    assert 'return preset?.name || tr("Unnamed")' in switcher_store
+    assert 'if (!o) return tr("Default LLM")' in switcher_store
+    assert '|| tr("Custom")' in switcher_store
+    assert 'data-i18n-scope="settings"' in model_config
+    assert "$store.modelConfig.getModelSections()" in model_config
+    assert 'data-i18n-scope="settings"' in model_field
+    assert 'data-i18n-scope="settings"' in model_presets
+    assert "$store.modelConfig.presetDisplayName(preset)" in model_presets
+    assert "$store.modelConfig.defaultPresetName(idx + 1)" in model_presets
+    assert "$store.modelConfig.defaultPresetName(presets.length + 1)" in model_presets
+    assert 'data-i18n-scope="settings"' in model_api_keys
+    assert 'data-i18n-scope="settings"' in model_summary
+    assert 'data-i18n-scope="settings"' in model_switcher
+    assert 'data-i18n-scope="settings"' in agent_settings
+    assert 'data-i18n-scope="settings"' in agent_config
+    assert 'data-i18n-scope="settings"' in agent_voice
     assert 'data-i18n-scope="settings"' in email_config
     assert 'data-i18n-placeholder="email.placeholder.routing"' in email_config
     assert 'data-i18n-placeholder="email.placeholder.reply"' in email_config
@@ -175,6 +206,18 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"System default": "시스템 기본값"' in ko_js
     assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
     assert '"Provider State": "제공자 상태"' in ko_js
+    assert '"Main Model": "메인 모델"' in ko_js
+    assert '"Utility Model": "유틸리티 모델"' in ko_js
+    assert '"Embedding Model": "임베딩 모델"' in ko_js
+    assert '"Model name": "모델 이름"' in ko_js
+    assert '"Per-Chat Override": "채팅별 재정의"' in ko_js
+    assert '"Default LLM": "기본 LLM"' in ko_js
+    assert '"Use Default": "기본값 사용"' in ko_js
+    assert '"Active agent profile": "활성 Agent 프로필"' in ko_js
+    assert '"Create new Agent Profile": "새 Agent 프로필 만들기"' in ko_js
+    assert '"e.g. GPT-4o, Claude Sonnet": "예: GPT-4o, Claude Sonnet"' in ko_js
+    assert '"For more information about Agent Zero Venice provider, see":' in ko_js
+    assert '"Voice capabilities are provided by built-in plugins. Browser-native speech remains available as the fallback output path when no TTS plugin is active. Enable or disable providers from the Agent Plugins section below.":' in ko_js
     assert '"Email Integration": "Email 통합"' in ko_js
     assert '"Connect Agent Zero and your email account": "Agent Zero와 이메일 계정을 연결하세요"' in ko_js
     assert '"Use a Google App Password. A regular Gmail password usually will not work here.":' in ko_js

@@ -18,7 +18,8 @@
       providerFallback — fallback provider string for search/API key status (e.g. preset.chat.provider for utility slot)
       apiBaseFallback  — fallback api_base string for search (e.g. preset.chat.api_base for utility slot)
   -->
-  <div x-data="{ get _prov() { return model.provider || (typeof providerFallback !== 'undefined' ? providerFallback : ''); }, get _apiBase() { return model.api_base || (typeof apiBaseFallback !== 'undefined' ? apiBaseFallback : ''); } }">
+  <div x-data="{ get _prov() { return model.provider || (typeof providerFallback !== 'undefined' ? providerFallback : ''); }, get _apiBase() { return model.api_base || (typeof apiBaseFallback !== 'undefined' ? apiBaseFallback : ''); } }"
+       data-i18n-scope="settings">
     <!-- Provider -->
     <div class="field">
       <div class="field-label">
