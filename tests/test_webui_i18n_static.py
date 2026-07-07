@@ -30,10 +30,11 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert 'globalThis.Alpine.store("i18n"' in i18n_js
     assert "function getReactiveLocale()" in i18n_js
     assert "export function scheduleTranslations" in i18n_js
-    assert "function registerAlpineTranslationHook()" in i18n_js
-    assert "globalThis.Alpine.interceptInit" in i18n_js
-    assert "function queueDynamicTranslations(root)" in i18n_js
-    assert "const pendingTranslationRoots = new Set();" in i18n_js
+    assert "function registerAlpineTranslationHook()" not in i18n_js
+    assert "globalThis.Alpine.interceptInit" not in i18n_js
+    assert "function queueDynamicTranslations(root)" not in i18n_js
+    assert "const pendingTranslationRoots = new Set();" not in i18n_js
+    assert "localeConfig?.messages?.[key] ?? localeConfig?.staticText?.[key]" in i18n_js
     assert "globalThis.Alpine.nextTick(reapply)" in i18n_js
     assert 'document.addEventListener("alpine:initialized", reapply' in i18n_js
     assert "window.addEventListener(\"load\", reapplyInitialLocale" in i18n_js
@@ -69,6 +70,22 @@ def test_webui_i18n_runtime_is_loaded_and_applies_component_translations() -> No
     assert '"Remote Control": "원격 제어"' in ko_js
     assert '"MCP Servers": "MCP 서버"' in ko_js
     assert '"chat.placeholder.start": "아무거나 물어보면 새 채팅이 시작됩니다"' in ko_js
+
+
+def test_literal_data_i18n_keys_use_static_text_catalog() -> None:
+    i18n_js = _read("webui/js/i18n/index.js")
+    ko_js = _read("webui/js/i18n/locales/ko.js")
+    agent_config = _read("webui/components/settings/agent/agent.html")
+    model_summary = _read("plugins/_model_config/webui/models-summary.html")
+
+    assert 'data-i18n="Agent Config"' in agent_config
+    assert 'data-i18n="Default agent profile"' in agent_config
+    assert 'data-i18n="Model Configuration"' in model_summary
+    assert '"Agent Config": "Agent 구성"' in ko_js
+    assert '"Default agent profile": "기본 Agent 프로필"' in ko_js
+    assert '"Model Configuration": "모델 구성"' in ko_js
+    assert "Literal data-i18n keys share the static text catalog" in i18n_js
+    assert "localeConfig?.messages?.[key] ?? localeConfig?.staticText?.[key]" in i18n_js
 
 
 def test_settings_locale_section_exposes_ui_language_choice() -> None:
