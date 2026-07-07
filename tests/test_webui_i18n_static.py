@@ -141,9 +141,12 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     plugins_store = _read("webui/components/settings/plugins/plugins-subsection-store.js")
     kokoro_store = _read("plugins/_kokoro_tts/webui/kokoro-tts-store.js")
     kokoro_panel = _read("plugins/_kokoro_tts/webui/main.html")
+    kokoro_config = _read("plugins/_kokoro_tts/webui/config.html")
     whisper_store = _read("plugins/_whisper_stt/webui/whisper-stt-store.js")
     whisper_panel = _read("plugins/_whisper_stt/webui/main.html")
+    whisper_config = _read("plugins/_whisper_stt/webui/config.html")
     model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
+    api_keys_mixin = _read("plugins/_model_config/webui/api-keys-mixin.js")
     model_config = _read("plugins/_model_config/webui/config.html")
     model_field = _read("plugins/_model_config/webui/model-field.html")
     model_presets = _read("plugins/_model_config/webui/main.html")
@@ -176,19 +179,43 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'return translateStaticText("Idle");' in kokoro_store
     assert "get enabledText()" in kokoro_store
     assert 'translateStaticText(this.enabled ? "Yes" : "No")' in kokoro_store
+    assert 'data-i18n-scope="settings"' in kokoro_panel
+    assert 'data-i18n="Kokoro TTS"' in kokoro_panel
+    assert 'data-i18n="Resolved Config"' in kokoro_panel
+    assert 'data-i18n="Open Settings"' in kokoro_panel
     assert 'x-text="$store.kokoroTts.enabledText"' in kokoro_panel
+    assert 'data-i18n-scope="settings"' in kokoro_config
+    assert 'data-i18n="Kokoro voice identifier passed to the backend pipeline."' in kokoro_config
+    assert 'data-i18n="Playback speed multiplier for Kokoro synthesis."' in kokoro_config
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in whisper_store
     assert 'translateStaticText(MicStatusLabels[status] || "Microphone")' in whisper_store
     assert 'translateStaticText("System default")' in whisper_store
     assert '"Send immediately" : "Draft in composer"' in whisper_store
+    assert 'translateStaticText("Failed to access the microphone. Please check browser permissions.")' in whisper_store
+    assert 'window.toastFetchError?.(translateStaticText("Transcription error"), error)' in whisper_store
     assert "get enabledText()" in whisper_store
     assert 'translateStaticText(this.enabled ? "Yes" : "No")' in whisper_store
+    assert 'data-i18n-scope="settings"' in whisper_panel
+    assert 'data-i18n="Whisper STT"' in whisper_panel
+    assert 'data-i18n="System default"' in whisper_panel
+    assert 'data-i18n="Device selection is browser-local and applies to the microphone button injected by this plugin."' in whisper_panel
     assert 'x-text="$store.whisperStt.enabledText"' in whisper_panel
+    assert 'data-i18n-scope="settings"' in whisper_config
+    assert 'data-i18n="Voice Message Handling"' in whisper_config
+    assert 'data-i18n="Silence Duration"' in whisper_config
+    assert 'data-i18n="Waiting Timeout"' in whisper_config
+    assert 'data-i18n="Language hint forwarded to Whisper. Set language to"' in whisper_config
+    assert 'data-i18n=" to let Whisper detect it."' in whisper_config
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in model_config_store
     assert "uiLocale: \"\"" in model_config_store
     assert "getModelSections()" in model_config_store
     assert "presetDisplayName(preset)" in model_config_store
     assert "defaultPresetName(index)" in model_config_store
+    assert "justToast(translateStaticText('Presets saved'))" in model_config_store
+    assert "justToast(translateStaticText('Failed to save presets'))" in model_config_store
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in api_keys_mixin
+    assert "translateStaticText('Failed to save API keys.')" in api_keys_mixin
+    assert "translateStaticText('Failed to load API key.')" in api_keys_mixin
     assert "title: translateStaticText('Main')" in model_config_store
     assert 'import { translateStaticText } from "/js/i18n/index.js";' in switcher_store
     assert 'return preset?.name || tr("Unnamed")' in switcher_store
@@ -287,6 +314,13 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"Yes": "예"' in ko_js
     assert '"No": "아니요"' in ko_js
     assert '"Request Mic Permission": "마이크 권한 요청"' in ko_js
+    assert '"Kokoro TTS": "Kokoro TTS"' in ko_js
+    assert '"Kokoro voice identifier passed to the backend pipeline.":' in ko_js
+    assert '"Whisper STT": "Whisper STT"' in ko_js
+    assert '"Voice Message Handling": "음성 메시지 처리"' in ko_js
+    assert '"Failed to access the microphone. Please check browser permissions.":' in ko_js
+    assert '"Failed to load API key.": "API 키를 불러오지 못했습니다."' in ko_js
+    assert '"Transcription error": "전사 오류"' in ko_js
     assert '"Your AI accounts": "AI 계정"' in ko_js
     assert '"System Resources": "시스템 리소스"' in ko_js
     assert '"Unsecured Connection": "보호되지 않은 연결"' in ko_js

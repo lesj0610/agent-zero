@@ -338,10 +338,10 @@ export const store = createStore("modelConfig", {
       });
       this.globalPresets = presets;
       this.switcherPresets = presets.filter(p => p.name);
-      justToast('Presets saved');
+      justToast(translateStaticText('Presets saved'));
     } catch (e) {
       console.error('Failed to save global presets:', e);
-      justToast('Failed to save presets');
+      justToast(translateStaticText('Failed to save presets'));
     }
   },
 

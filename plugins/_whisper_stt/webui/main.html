@@ -9,94 +9,95 @@
 <body>
   <div
     x-data
+    data-i18n-scope="settings"
     x-init="$store.whisperStt.initRuntime()"
     class="speech-plugin-page"
   >
     <template x-if="$store.whisperStt">
       <div>
-        <div class="section-title">Whisper STT</div>
-        <div class="section-description">
+        <div class="section-title" data-i18n="Whisper STT">Whisper STT</div>
+        <div class="section-description" data-i18n="Built-in Whisper transcription. Dependency installation stays on the Docker/bootstrap path; this plugin only owns the speech-to-text behavior, UI, and routing.">
           Built-in Whisper transcription. Dependency installation stays on the Docker/bootstrap path;
           this plugin only owns the speech-to-text behavior, UI, and routing.
         </div>
 
         <div class="speech-plugin-grid">
           <div class="speech-plugin-card">
-            <div class="field-title">Provider State</div>
+            <div class="field-title" data-i18n="Provider State">Provider State</div>
             <div class="status-row">
-              <span class="status-key">Enabled</span>
+              <span class="status-key" data-i18n="Enabled">Enabled</span>
               <span class="status-badge" :class="$store.whisperStt.enabled ? 'ok' : 'warn'" x-text="$store.whisperStt.enabledText"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Model</span>
+              <span class="status-key" data-i18n="Model">Model</span>
               <span class="status-badge" :class="$store.whisperStt.statusClass" x-text="$store.whisperStt.statusText"></span>
             </div>
             <div class="status-row" x-show="$store.whisperStt.loadedModel">
-              <span class="status-key">Loaded</span>
+              <span class="status-key" data-i18n="Loaded">Loaded</span>
               <span class="status-value" x-text="$store.whisperStt.loadedModel"></span>
             </div>
             <div class="status-row" x-show="$store.whisperStt.packageVersion">
-              <span class="status-key">Package</span>
+              <span class="status-key" data-i18n="Package">Package</span>
               <span class="status-value" x-text="$store.whisperStt.packageVersion"></span>
             </div>
           </div>
 
           <div class="speech-plugin-card">
-            <div class="field-title">Resolved Config</div>
+            <div class="field-title" data-i18n="Resolved Config">Resolved Config</div>
             <div class="status-row">
-              <span class="status-key">Model size</span>
+              <span class="status-key" data-i18n="Model size">Model size</span>
               <span class="status-value" x-text="$store.whisperStt.config.model_size"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Language</span>
+              <span class="status-key" data-i18n="Language">Language</span>
               <span class="status-value" x-text="$store.whisperStt.config.language"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Message</span>
+              <span class="status-key" data-i18n="Message">Message</span>
               <span class="status-value" x-text="$store.whisperStt.messageModeLabel"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Threshold</span>
+              <span class="status-key" data-i18n="Threshold">Threshold</span>
               <span class="status-value" x-text="$store.whisperStt.config.silence_threshold"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Silence</span>
+              <span class="status-key" data-i18n="Silence">Silence</span>
               <span class="status-value" x-text="`${$store.whisperStt.config.silence_duration} ms`"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Wait</span>
+              <span class="status-key" data-i18n="Wait">Wait</span>
               <span class="status-value" x-text="`${$store.whisperStt.config.waiting_timeout} ms`"></span>
             </div>
           </div>
 
           <div class="speech-plugin-card">
-            <div class="field-title">Microphone</div>
+            <div class="field-title" data-i18n="Microphone">Microphone</div>
             <div class="status-row">
-              <span class="status-key">Status</span>
+              <span class="status-key" data-i18n="Status">Status</span>
               <span class="status-badge warn" x-text="$store.whisperStt.micStatus"></span>
             </div>
             <label class="device-picker">
-              <span class="status-key">Device</span>
+              <span class="status-key" data-i18n="Device">Device</span>
               <select
                 :value="$store.whisperStt.selectedDevice"
                 @change="$store.whisperStt.selectDevice($event.target.value)"
               >
-                <option value="">System default</option>
+                <option value="" data-i18n="System default">System default</option>
                 <template x-for="device in $store.whisperStt.devices" :key="device.deviceId">
                   <option :value="device.deviceId" x-text="device.label || `Microphone ${device.deviceId}`"></option>
                 </template>
               </select>
             </label>
-            <div class="field-description">
+            <div class="field-description" data-i18n="Device selection is browser-local and applies to the microphone button injected by this plugin.">
               Device selection is browser-local and applies to the microphone button injected by this plugin.
             </div>
           </div>
         </div>
 
         <div class="speech-plugin-actions">
-          <button class="btn btn-field" @click="$store.whisperStt.requestMicrophonePermission()">Request Mic Permission</button>
-          <button class="btn btn-field" @click="$store.whisperStt.openConfig()">Open Settings</button>
-          <button class="btn btn-field" @click="$store.whisperStt.refreshStatus()">Refresh</button>
+          <button class="btn btn-field" @click="$store.whisperStt.requestMicrophonePermission()" data-i18n="Request Mic Permission">Request Mic Permission</button>
+          <button class="btn btn-field" @click="$store.whisperStt.openConfig()" data-i18n="Open Settings">Open Settings</button>
+          <button class="btn btn-field" @click="$store.whisperStt.refreshStatus()" data-i18n="Refresh">Refresh</button>
         </div>
       </div>
     </template>

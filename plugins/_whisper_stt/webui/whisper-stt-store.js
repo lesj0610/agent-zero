@@ -469,7 +469,7 @@ class MicrophoneInput {
     } catch (error) {
       console.error("[Whisper STT] Microphone initialization failed", error);
       globalThis.toast?.(
-        "Failed to access the microphone. Please check browser permissions.",
+        translateStaticText("Failed to access the microphone. Please check browser permissions."),
         "error",
       );
       this.status = Status.INACTIVE;
@@ -640,7 +640,7 @@ class MicrophoneInput {
       }
     } catch (error) {
       console.error("[Whisper STT] Transcription failed", error);
-      window.toastFetchError?.("Transcription error", error);
+      window.toastFetchError?.(translateStaticText("Transcription error"), error);
     } finally {
       this.audioChunks = [];
       if (this.status === Status.PROCESSING) {
