@@ -1,4 +1,5 @@
 import { fetchApi } from "/js/api.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 const API_BASE = "/plugins/_model_config";
 const CREATE_AGENT_PROFILE_PROMPT = `I want to create a new Agent Zero agent profile.
@@ -17,6 +18,11 @@ function formatModelIdentity(value) {
   if (!value) return "";
   if (value.provider && value.name) return `${value.provider}/${value.name}`;
   return value.name || value.provider || "";
+}
+
+function tr(value = "") {
+  globalThis.Alpine?.store?.("i18n")?.locale;
+  return translateStaticText(value);
 }
 
 export const switcherState = {
@@ -143,7 +149,7 @@ export const switcherMethods = {
       return true;
     } catch (e) {
       console.error("Failed to create agent profile chat:", e);
-      window.toastFetchError?.("Failed to start profile creator", e);
+      window.toastFetchError?.(tr("Failed to start profile creator"), e);
       return false;
     }
   },
@@ -154,7 +160,7 @@ export const switcherMethods = {
     const chatsStore = window.Alpine?.store("chats");
     const selectedContext = chatsStore?.selectedContext;
     if (selectedContext?.running) {
-      window.justToast?.("Agent profile can be changed after the current run finishes.", "warning", 2500, "agent-profile-switch");
+      window.justToast?.(tr("Agent profile can be changed after the current run finishes."), "warning", 2500, "agent-profile-switch");
       return false;
     }
 
@@ -178,11 +184,11 @@ export const switcherMethods = {
         selectedContext.agent_profile = data.agent_profile || agentProfile;
         selectedContext.agent_profile_label = label;
       }
-      window.justToast?.(`Agent profile: ${label}`, "success", 1600, "agent-profile-switch");
+      window.justToast?.(`${tr("Agent profile")}: ${label}`, "success", 1600, "agent-profile-switch");
       return true;
     } catch (e) {
       console.error("Failed to set active agent profile:", e);
-      window.toastFetchError?.("Failed to set agent profile", e);
+      window.toastFetchError?.(tr("Failed to set agent profile"), e);
       return false;
     } finally {
       this.agentProfileSaving = false;
@@ -190,7 +196,7 @@ export const switcherMethods = {
   },
 
   getPresetLabel(preset) {
-    return preset?.name || "Unnamed";
+    return preset?.name || tr("Unnamed");
   },
 
   getPresetSummary(preset) {
@@ -229,11 +235,11 @@ export const switcherMethods = {
 
   getSwitcherLabel() {
     const o = this.switcherOverride;
-    if (!o) return 'Default LLM';
+    if (!o) return tr("Default LLM");
     if (o.preset_name) return o.preset_name;
 
     const models = this.getCustomOverrideModels();
-    return formatModelIdentity(models.main) || formatModelIdentity(models.utility) || o.name || o.provider || 'Custom';
+    return formatModelIdentity(models.main) || formatModelIdentity(models.utility) || o.name || o.provider || tr("Custom");
   },
 
   getActivePreset() {

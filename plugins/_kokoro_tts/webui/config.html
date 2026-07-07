@@ -4,19 +4,19 @@
 </head>
 
 <body>
-  <div x-data>
+  <div x-data data-i18n-scope="settings">
     <template x-if="config">
       <div class="plugin-config-page">
-        <div class="section-title">Kokoro TTS</div>
-        <div class="section-description">
+        <div class="section-title" data-i18n="Kokoro TTS">Kokoro TTS</div>
+        <div class="section-description" data-i18n="Configure the built-in Kokoro voice provider. When this plugin is disabled, spoken output falls back to the browser speech API.">
           Configure the built-in Kokoro voice provider. When this plugin is disabled,
           spoken output falls back to the browser speech API.
         </div>
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Voice</div>
-            <div class="field-description">Kokoro voice identifier passed to the backend pipeline.</div>
+            <div class="field-title" data-i18n="Voice">Voice</div>
+            <div class="field-description" data-i18n="Kokoro voice identifier passed to the backend pipeline.">Kokoro voice identifier passed to the backend pipeline.</div>
           </div>
           <div class="field-control">
             <input type="text" x-model="config.voice" />
@@ -25,8 +25,8 @@
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Speed</div>
-            <div class="field-description">Playback speed multiplier for Kokoro synthesis.</div>
+            <div class="field-title" data-i18n="Speed">Speed</div>
+            <div class="field-description" data-i18n="Playback speed multiplier for Kokoro synthesis.">Playback speed multiplier for Kokoro synthesis.</div>
           </div>
           <div class="field-control">
             <input type="number" min="0.1" step="0.1" x-model.number="config.speed" />

@@ -1,5 +1,6 @@
 import * as api from "./api.js";
 import * as cache from "./cache.js";
+import { scheduleTranslations } from "./i18n/index.js";
 
 /**
  * @typedef {string} WebuiExtension
@@ -28,6 +29,19 @@ export const API_EXTENSION_EXCLUDED_ENDPOINTS = new Set([
 export function clearCache() {
   cache.clear(JS_CACHE_AREA);
   cache.clear(HTML_CACHE_AREA);
+}
+
+/**
+ * @param {HTMLElement} targetElement
+ * @param {string} html
+ * @returns {void}
+ */
+function renderHtmlExtension(targetElement, html) {
+  if (targetElement.closest?.(".settings-modal, .settings-pane, #settings-sections")) {
+    targetElement.setAttribute("data-i18n-scope", "settings");
+  }
+  targetElement.innerHTML = html;
+  scheduleTranslations(targetElement);
 }
 
 /**
@@ -162,7 +176,7 @@ export async function importHtmlExtensions(extensionPoint, targetElement) {
   try {
     const cachedHtml = cache.get(HTML_CACHE_AREA, extensionPoint, null);
     if (cachedHtml != null) {
-      targetElement.innerHTML = cachedHtml;
+      renderHtmlExtension(targetElement, cachedHtml);
       return;
     }
 
@@ -177,7 +191,7 @@ export async function importHtmlExtensions(extensionPoint, targetElement) {
       combinedHTML += `<x-component path="${path}"></x-component>`;
     }
     cache.add(HTML_CACHE_AREA, extensionPoint, combinedHTML);
-    targetElement.innerHTML = combinedHTML;
+    renderHtmlExtension(targetElement, combinedHTML);
   } catch (error) {
     console.error("Error importing HTML extensions:", error);
     return;

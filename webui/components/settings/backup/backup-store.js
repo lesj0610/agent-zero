@@ -6,11 +6,16 @@ import {
   getUserHour12,
   getUserTimezone,
 } from "/js/time-utils.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
 const toast = globalThis.toast;
 const fetchApi = globalThis.fetchApi;
+
+function tr(value) {
+  return translateStaticText(value);
+}
 
 // ⚠️ CRITICAL: The .env file contains API keys and essential configuration.
 // This file is REQUIRED for Agent Zero to function and must be backed up.
@@ -102,15 +107,15 @@ const model = {
   },
 
   showDownloadPreparingToast(group) {
-    window.toastFrontendInfo?.("Preparing download...", "Download", 0, group, undefined, true);
+    window.toastFrontendInfo?.(tr("Preparing download..."), tr("Download"), 0, group, undefined, true);
   },
 
   showDownloadStartedToast(group) {
-    window.toastFrontendInfo?.("Downloading...", "Download", 3, group, undefined, true);
+    window.toastFrontendInfo?.(tr("Downloading..."), tr("Download"), 3, group, undefined, true);
   },
 
   showDownloadErrorToast(group, message) {
-    window.toastFrontendError?.(message || "Download failed", "Download Error", 8, group, undefined, true);
+    window.toastFrontendError?.(message || tr("Download failed"), tr("Download Error"), 8, group, undefined, true);
   },
 
   // Cleanup method for modal close
@@ -249,7 +254,7 @@ const model = {
       editor.navigateFileStart();
     } catch (error) {
       console.error("Failed to format JSON:", error);
-      this.error = "Invalid JSON: " + error.message;
+      this.error = `${tr("Invalid JSON")}: ${error.message}`;
     }
   },
 
@@ -292,7 +297,7 @@ const model = {
         this.error = response.error;
       }
     } catch (error) {
-      this.error = `Preview error: ${error.message}`;
+      this.error = `${tr("Preview error")}: ${error.message}`;
     }
   },
 
@@ -336,7 +341,7 @@ const model = {
       this.error = '';
       return true;
     } catch (error) {
-      this.error = `Invalid backup metadata: ${error.message}`;
+      this.error = `${tr("Invalid backup metadata")}: ${error.message}`;
       return false;
     }
   },
@@ -403,9 +408,9 @@ const model = {
     const fileList = this.previewFiles.map(f => f.path).join('\n');
     try {
       await navigator.clipboard.writeText(fileList);
-      window.toastFrontendInfo('File list copied to clipboard', 'Clipboard');
+      window.toastFrontendInfo(tr("File list copied to clipboard"), tr("Clipboard"));
     } catch (error) {
-      window.toastFrontendError('Failed to copy to clipboard', 'Clipboard Error');
+      window.toastFrontendError(tr("Failed to copy to clipboard"), tr("Clipboard Error"));
     }
   },
 
@@ -420,10 +425,10 @@ const model = {
 
     try {
       this.loading = true;
-      this.loadingMessage = 'Creating backup...';
+      this.loadingMessage = tr("Creating backup...");
       this.error = '';
       this.clearFileOperations();
-      this.addFileOperation('Starting backup creation...');
+      this.addFileOperation(tr("Starting backup creation..."));
       this.showDownloadPreparingToast(downloadToastGroup);
 
       const metadata = this.backupMetadataConfig;
@@ -450,24 +455,24 @@ const model = {
         a.click();
         window.URL.revokeObjectURL(url);
 
-        this.addFileOperation('Backup created and downloaded successfully!');
+        this.addFileOperation(tr("Backup created and downloaded successfully!"));
         this.showDownloadStartedToast(downloadToastGroup);
       } else {
         // Try to parse error response
         const errorText = await response.text();
         try {
           const errorJson = JSON.parse(errorText);
-          this.error = errorJson.error || 'Backup creation failed';
+          this.error = errorJson.error || tr("Backup creation failed");
         } catch {
-          this.error = `Backup creation failed: ${response.status} ${response.statusText}`;
+          this.error = `${tr("Backup creation failed")}: ${response.status} ${response.statusText}`;
         }
-        this.addFileOperation(`Error: ${this.error}`);
+        this.addFileOperation(`${tr("Error")}: ${this.error}`);
         this.showDownloadErrorToast(downloadToastGroup, this.error);
       }
 
     } catch (error) {
-      this.error = `Backup error: ${error.message}`;
-      this.addFileOperation(`Error: ${error.message}`);
+      this.error = `${tr("Backup error")}: ${error.message}`;
+      this.addFileOperation(`${tr("Error")}: ${error.message}`);
       this.showDownloadErrorToast(downloadToastGroup, this.error);
     } finally {
       this.loading = false;
@@ -496,12 +501,12 @@ const model = {
         this.showDownloadStartedToast(downloadToastGroup);
       } else {
         const errorText = await response.text();
-        this.error = errorText || `Download failed: ${response.status}`;
+        this.error = errorText || `${tr("Download failed")}: ${response.status}`;
         this.showDownloadErrorToast(downloadToastGroup, this.error);
       }
     } catch (error) {
       console.error('Download error:', error);
-      this.error = error.message || 'Download failed';
+      this.error = error.message || tr("Download failed");
       this.showDownloadErrorToast(downloadToastGroup, this.error);
     }
   },
@@ -542,10 +547,10 @@ const model = {
 
     try {
       this.loading = true;
-      this.loadingMessage = 'Performing dry run...';
+      this.loadingMessage = tr("Performing dry run...");
       this.error = '';
       this.clearFileOperations();
-      this.addFileOperation('Starting backup dry run...');
+      this.addFileOperation(tr("Starting backup dry run..."));
 
       const metadata = this.backupMetadataConfig;
       const patternsString = this.convertPatternsToString(metadata.include_patterns, metadata.exclude_patterns);
@@ -557,19 +562,19 @@ const model = {
       });
 
       if (response.success) {
-        this.addFileOperation(`Found ${response.files.length} files that would be backed up:`);
+        this.addFileOperation(`${tr("Found")} ${response.files.length} ${tr("files that would be backed up")}:`);
         response.files.forEach((file, index) => {
           this.addFileOperation(`${index + 1}. ${file.path} (${this.formatFileSize(file.size)})`);
         });
-        this.addFileOperation(`\nTotal: ${response.files.length} files, ${this.formatFileSize(response.files.reduce((sum, f) => sum + f.size, 0))}`);
-        this.addFileOperation('Dry run completed successfully.');
+        this.addFileOperation(`\n${tr("Total")}: ${response.files.length} ${tr("files")}, ${this.formatFileSize(response.files.reduce((sum, f) => sum + f.size, 0))}`);
+        this.addFileOperation(tr("Dry run completed successfully."));
       } else {
         this.error = response.error;
-        this.addFileOperation(`Error: ${response.error}`);
+        this.addFileOperation(`${tr("Error")}: ${response.error}`);
       }
     } catch (error) {
-      this.error = `Dry run error: ${error.message}`;
-      this.addFileOperation(`Error: ${error.message}`);
+      this.error = `${tr("Dry run error")}: ${error.message}`;
+      this.addFileOperation(`${tr("Error")}: ${error.message}`);
     } finally {
       this.loading = false;
     }
@@ -577,17 +582,17 @@ const model = {
 
   async dryRunRestore() {
     if (!this.backupFile) {
-      this.error = 'Please select a backup file first';
+      this.error = tr("Please select a backup file first");
       return;
     }
 
     try {
       this.loading = true;
-      this.loadingMessage = 'Performing restore dry run...';
+      this.loadingMessage = tr("Performing restore dry run...");
       this.error = '';
       this.restoreResult = null;
       this.clearFileOperations();
-      this.addFileOperation('Starting restore dry run...');
+      this.addFileOperation(tr("Starting restore dry run..."));
 
       const formData = new FormData();
       formData.append('backup_file', this.backupFile);
@@ -605,24 +610,24 @@ const model = {
       if (result.success) {
         // Show delete operations if clean before restore is enabled
         if (result.files_to_delete && result.files_to_delete.length > 0) {
-          this.addFileOperation(`Clean before restore - ${result.files_to_delete.length} files would be deleted:`);
+          this.addFileOperation(`${tr("Clean before restore")} - ${result.files_to_delete.length} ${tr("files would be deleted")}:`);
           result.files_to_delete.forEach((file, index) => {
-            this.addFileOperation(`${index + 1}. DELETE: ${file.path}`);
+            this.addFileOperation(`${index + 1}. ${tr("DELETE")}: ${file.path}`);
           });
           this.addFileOperation('');
         }
 
         // Show restore operations
         if (result.files_to_restore && result.files_to_restore.length > 0) {
-          this.addFileOperation(`${result.files_to_restore.length} files would be restored:`);
+          this.addFileOperation(`${result.files_to_restore.length} ${tr("files would be restored")}:`);
           result.files_to_restore.forEach((file, index) => {
-            this.addFileOperation(`${index + 1}. RESTORE: ${file.original_path} -> ${file.target_path}`);
+            this.addFileOperation(`${index + 1}. ${tr("RESTORE")}: ${file.original_path} -> ${file.target_path}`);
           });
         }
 
         // Show skipped files
         if (result.skipped_files && result.skipped_files.length > 0) {
-          this.addFileOperation(`\nSkipped ${result.skipped_files.length} files:`);
+          this.addFileOperation(`\n${tr("Skipped")} ${result.skipped_files.length} ${tr("files")}:`);
           result.skipped_files.forEach((file, index) => {
             this.addFileOperation(`${index + 1}. ${file.original_path} (${file.reason})`);
           });
@@ -632,15 +637,15 @@ const model = {
         const restoreCount = result.restore_count || 0;
         const skippedCount = result.skipped_files?.length || 0;
 
-        this.addFileOperation(`\nSummary: ${deleteCount} to delete, ${restoreCount} to restore, ${skippedCount} skipped`);
-        this.addFileOperation('Dry run completed successfully.');
+        this.addFileOperation(`\n${tr("Summary")}: ${deleteCount} ${tr("to delete")}, ${restoreCount} ${tr("to restore")}, ${skippedCount} ${tr("skipped")}`);
+        this.addFileOperation(tr("Dry run completed successfully."));
       } else {
         this.error = result.error;
-        this.addFileOperation(`Error: ${result.error}`);
+        this.addFileOperation(`${tr("Error")}: ${result.error}`);
       }
     } catch (error) {
-      this.error = `Dry run error: ${error.message}`;
-      this.addFileOperation(`Error: ${error.message}`);
+      this.error = `${tr("Dry run error")}: ${error.message}`;
+      this.addFileOperation(`${tr("Error")}: ${error.message}`);
     } finally {
       this.loading = false;
     }
@@ -657,7 +662,7 @@ const model = {
 
     try {
       this.loading = true;
-      this.loadingMessage = 'Inspecting backup archive...';
+      this.loadingMessage = tr("Inspecting backup archive...");
 
       const formData = new FormData();
       formData.append('backup_file', file);
@@ -688,7 +693,7 @@ const model = {
         this.backupMetadata = null;
       }
     } catch (error) {
-      this.error = `Inspection error: ${error.message}`;
+      this.error = `${tr("Inspection error")}: ${error.message}`;
       this.backupMetadata = null;
     } finally {
       this.loading = false;
@@ -706,7 +711,7 @@ const model = {
     const currentVersion = globalThis.gitinfo.version; // Retrieved from git.get_git_info() on backend
 
     if (backupVersion !== currentVersion && backupVersion !== "development") {
-      warnings.push(`Backup created with Agent Zero ${backupVersion}, current version is ${currentVersion}`);
+      warnings.push(`${tr("Backup created with Agent Zero")} ${backupVersion}, ${tr("current version is")} ${currentVersion}`);
     }
 
     // Check backup age
@@ -714,7 +719,7 @@ const model = {
     const daysSinceBackup = (Date.now() - backupDate) / (1000 * 60 * 60 * 24);
 
     if (daysSinceBackup > 30) {
-      warnings.push(`Backup is ${Math.floor(daysSinceBackup)} days old`);
+      warnings.push(`${tr("Backup is")} ${Math.floor(daysSinceBackup)} ${tr("days old")}`);
     }
 
     // Check system compatibility
@@ -724,23 +729,23 @@ const model = {
     }
 
     if (warnings.length > 0) {
-      window.toastFrontendWarning(`Compatibility warnings: ${warnings.join(', ')}`, 'Backup Compatibility');
+      window.toastFrontendWarning(`${tr("Compatibility warnings")}: ${warnings.join(', ')}`, tr("Backup Compatibility"));
     }
   },
 
   async performRestore() {
     if (!this.backupFile) {
-      this.error = 'Please select a backup file';
+      this.error = tr("Please select a backup file");
       return;
     }
 
     try {
       this.loading = true;
-      this.loadingMessage = 'Restoring files...';
+      this.loadingMessage = tr("Restoring files...");
       this.error = '';
       this.restoreResult = null;
       this.clearFileOperations();
-      this.addFileOperation('Starting file restoration...');
+      this.addFileOperation(tr("Starting file restoration..."));
 
       const formData = new FormData();
       formData.append('backup_file', this.backupFile);
@@ -758,22 +763,22 @@ const model = {
       if (result.success) {
         // Log deleted files if clean before restore was enabled
         if (result.deleted_files && result.deleted_files.length > 0) {
-          this.addFileOperation(`Clean before restore - Successfully deleted ${result.deleted_files.length} files:`);
+          this.addFileOperation(`${tr("Clean before restore")} - ${tr("Successfully deleted")} ${result.deleted_files.length} ${tr("files")}:`);
           result.deleted_files.forEach((file, index) => {
-            this.addFileOperation(`${index + 1}. DELETED: ${file.path}`);
+            this.addFileOperation(`${index + 1}. ${tr("DELETED")}: ${file.path}`);
           });
           this.addFileOperation('');
         }
 
         // Log restored files
-        this.addFileOperation(`Successfully restored ${result.restored_files.length} files:`);
+        this.addFileOperation(`${tr("Successfully restored")} ${result.restored_files.length} ${tr("files")}:`);
         result.restored_files.forEach((file, index) => {
-          this.addFileOperation(`${index + 1}. RESTORED: ${file.archive_path} -> ${file.target_path}`);
+          this.addFileOperation(`${index + 1}. ${tr("RESTORED")}: ${file.archive_path} -> ${file.target_path}`);
         });
 
         // Log skipped files
         if (result.skipped_files && result.skipped_files.length > 0) {
-          this.addFileOperation(`\nSkipped ${result.skipped_files.length} files:`);
+          this.addFileOperation(`\n${tr("Skipped")} ${result.skipped_files.length} ${tr("files")}:`);
           result.skipped_files.forEach((file, index) => {
             this.addFileOperation(`${index + 1}. ${file.original_path} (${file.reason})`);
           });
@@ -781,7 +786,7 @@ const model = {
 
         // Log errors
         if (result.errors && result.errors.length > 0) {
-          this.addFileOperation(`\nErrors during restoration:`);
+          this.addFileOperation(`\n${tr("Errors during restoration")}:`);
           result.errors.forEach((error, index) => {
             this.addFileOperation(`${index + 1}. ${error.original_path}: ${error.error}`);
           });
@@ -792,16 +797,16 @@ const model = {
         const skippedCount = result.skipped_files?.length || 0;
         const errorCount = result.errors?.length || 0;
 
-        this.addFileOperation(`\nRestore completed: ${deletedCount} deleted, ${restoredCount} restored, ${skippedCount} skipped, ${errorCount} errors`);
+        this.addFileOperation(`\n${tr("Restore completed")}: ${deletedCount} ${tr("deleted")}, ${restoredCount} ${tr("restored")}, ${skippedCount} ${tr("skipped")}, ${errorCount} ${tr("errors")}`);
         this.restoreResult = result;
-        window.toastFrontendInfo('Restore completed successfully', 'Restore Status');
+        window.toastFrontendInfo(tr("Restore completed successfully"), tr("Restore Status"));
       } else {
         this.error = result.error;
-        this.addFileOperation(`Error: ${result.error}`);
+        this.addFileOperation(`${tr("Error")}: ${result.error}`);
       }
     } catch (error) {
-      this.error = `Restore error: ${error.message}`;
-      this.addFileOperation(`Error: ${error.message}`);
+      this.error = `${tr("Restore error")}: ${error.message}`;
+      this.addFileOperation(`${tr("Error")}: ${error.message}`);
     } finally {
       this.loading = false;
     }
@@ -825,7 +830,7 @@ const model = {
       this.error = '';
       return true;
     } catch (error) {
-      this.error = `Invalid JSON metadata: ${error.message}`;
+      this.error = `${tr("Invalid JSON metadata")}: ${error.message}`;
       return false;
     }
   },
@@ -851,7 +856,7 @@ const model = {
 
   // Utility
   formatTimestamp(timestamp) {
-    if (!timestamp) return 'Unknown';
+    if (!timestamp) return tr("Unknown");
     return formatDateTime(timestamp, "full");
   },
 
@@ -863,7 +868,7 @@ const model = {
   },
 
   formatDate(dateString) {
-    if (!dateString) return 'Unknown';
+    if (!dateString) return tr("Unknown");
     return formatDateTime(dateString, "date");
   }
 };

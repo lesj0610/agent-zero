@@ -1,4 +1,5 @@
 import { fetchApi } from "/js/api.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 const API_BASE = "/plugins/_model_config";
 const API_KEY_PLACEHOLDER = "************";
@@ -119,7 +120,7 @@ export const apiKeysMethods = {
     });
     const data = await res.json();
     if (!data?.ok) {
-      throw new Error(data?.error || 'Failed to save API keys.');
+      throw new Error(data?.error || translateStaticText('Failed to save API keys.'));
     }
 
     const nextValues = { ...this.apiKeyValues };
@@ -157,7 +158,7 @@ export const apiKeysMethods = {
     });
     const data = await res.json();
     if (!data?.ok) {
-      throw new Error(data?.error || 'Failed to load API key.');
+      throw new Error(data?.error || translateStaticText('Failed to load API key.'));
     }
     const value = data.value || '';
     if (provider) {

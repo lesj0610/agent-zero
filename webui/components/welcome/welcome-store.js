@@ -5,6 +5,7 @@ import { store as projectsStore } from "/components/projects/projects-store.js";
 import { store as fileBrowserStore } from "/components/modals/file-browser/file-browser-store.js";
 import * as API from "/js/api.js";
 import { getCurrentUserISOString } from "/js/time-utils.js";
+import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";
 
 const model = {
   // State
@@ -13,6 +14,8 @@ const model = {
   lastBannerRefresh: 0,
   hasDismissedBanners: false,
   _initialized: false,
+  _localeChangeHandler: null,
+  uiLocale: getCurrentLocale(),
 
   get isVisible() {
     return !chatsStore.selected;
@@ -28,6 +31,12 @@ const model = {
         this.refreshBanners(true);
       }
     });
+    if (!this._localeChangeHandler) {
+      this._localeChangeHandler = (event) => {
+        this.uiLocale = event?.detail?.locale || getCurrentLocale();
+      };
+      document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+    }
   },
 
   onCreate() {
@@ -141,19 +150,106 @@ const model = {
   },
 
   get sortedBanners() {
+    this.uiLocale;
     return [...this.banners]
       .filter((b) => b.id !== "system-resources")
       .filter((b) => b.id !== "missing-api-key")
       .filter((b) => b.type !== "hero" && b.type !== "feature")
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      .map((banner) => this.localizeBanner(banner));
   },
 
   get systemResourceBanner() {
     return this.banners.find((b) => b.id === "system-resources") || null;
   },
 
+  get systemResourceTitle() {
+    this.uiLocale;
+    return translateStaticText(this.systemResourceBanner?.title || "System Resources");
+  },
+
+  get systemResourceHtml() {
+    this.uiLocale;
+    return this.localizeSystemResourceHtml(this.systemResourceBanner?.html || "");
+  },
+
   get heroSubtitle() {
-    return "How can I help you today?";
+    this.uiLocale;
+    return t("welcome.subtitle", "How can I help you today?");
+  },
+
+  localizeSystemResourceHtml(html) {
+    if (!html || typeof document === "undefined") return html || "";
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    for (const el of template.content.querySelectorAll(".system-resource-name")) {
+      const original = el.textContent || "";
+      el.textContent = translateStaticText(original);
+    }
+
+    for (const valueEl of template.content.querySelectorAll(".system-resource-value")) {
+      const original = valueEl.textContent || "";
+      valueEl.textContent = original.replace(/\((\d+) cores\)/, (_, count) => {
+        return `(${count} ${translateStaticText("cores")})`;
+      });
+    }
+
+    for (const detail of template.content.querySelectorAll(".system-resource-detail")) {
+      const titleEl = detail.querySelector(".system-resource-detail-title");
+      const valueEl = detail.querySelector(".system-resource-detail-value");
+      const originalTitle = titleEl?.textContent || "";
+      if (titleEl) {
+        titleEl.textContent = translateStaticText(originalTitle);
+      }
+      if (originalTitle === "Net (since boot)" && valueEl) {
+        const match = (valueEl.textContent || "").match(/^(.+?) sent \/ (.+?) recv$/);
+        if (match) {
+          valueEl.textContent = `${match[1]} ${translateStaticText("sent")} / ${match[2]} ${translateStaticText("recv")}`;
+        }
+      }
+    }
+
+    return template.innerHTML;
+  },
+
+  localizeBanner(banner) {
+    return {
+      ...banner,
+      title: translateStaticText(banner?.title || ""),
+      html: this.localizeBannerHtml(banner?.html || ""),
+      cta_text: translateStaticText(banner?.cta_text || ""),
+    };
+  },
+
+  localizeBannerHtml(html) {
+    if (!html || typeof document === "undefined") return html || "";
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    const walker = document.createTreeWalker(
+      template.content,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent || parent.closest("script, style, code, pre")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return node.nodeValue?.trim()
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      },
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      node.nodeValue = translateStaticText(node.nodeValue || "");
+    }
+    return template.innerHTML;
   },
 
   executeBannerAction(action) {

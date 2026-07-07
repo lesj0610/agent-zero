@@ -17,8 +17,10 @@ import { store as syncStore } from "/components/sync/sync-store.js"
 import { store as welcomeStore } from "/components/welcome/welcome-store.js";
 import { store as modelGateStore } from "/components/chat/model-gate-store.js";
 import { getUserHour12, getUserTimezone } from "/js/time-utils.js";
+import { initI18n, t } from "/js/i18n/index.js";
 
 globalThis.fetchApi = api.fetchApi; // TODO - backward compatibility for non-modular scripts, remove once refactored to alpine
+initI18n();
 
 // Declare variables for DOM elements, they will be assigned on DOMContentLoaded
 let leftPanel,
@@ -109,7 +111,7 @@ export async function sendMessage(options = {}) {
       if (hasAttachments) {
         const heading =
           attachmentsWithUrls.length > 0
-            ? "Uploading attachments..."
+            ? t("app.loading.attachments", "Uploading attachments...")
             : "";
 
         // Render user message with attachments
@@ -152,13 +154,13 @@ export async function sendMessage(options = {}) {
       // Handle response
       const jsonResponse = await response.json();
       if (!jsonResponse) {
-        toast("No response returned.", "error");
+        toast(t("app.error.noResponse", "No response returned."), "error");
       } else {
         setContext(jsonResponse.context);
       }
     }
   } catch (e) {
-    toastFetchError("Error sending message", e); // Will use new notification system
+    toastFetchError(t("app.error.sendMessage", "Error sending message"), e); // Will use new notification system
   }
 }
 globalThis.sendMessage = sendMessage;
@@ -188,7 +190,7 @@ export function toastFetchError(text, error) {
     // Backend is disconnected, show connection error
     toastFrontendError(
       `${text} (backend appears to be disconnected): ${errorMessage}`,
-      "Connection Error"
+      t("app.error.connection", "Connection Error")
     ).catch((e) => console.error("Failed to show connection error toast:", e));
   }
 }

@@ -4,18 +4,18 @@
   </head>
 
   <body>
-    <div x-data>
+    <div x-data data-i18n-scope="settings">
       <template x-if="$store.settings.settings">
         <div>
-          <div class="section-title">Agent Config</div>
-          <div class="section-description">
+          <div class="section-title" data-i18n="Agent Config">Agent Config</div>
+          <div class="section-description" data-i18n="Choose the default personality and operating profile for new chats.">
             Choose the default personality and operating profile for new chats.
           </div>
 
           <div class="field">
             <div class="field-label">
-              <div class="field-title">Default agent profile</div>
-              <div class="field-description">
+              <div class="field-title" data-i18n="Default agent profile">Default agent profile</div>
+              <div class="field-description" data-i18n="New top-level chats start here. Existing chats keep their own selected profile.">
                 New top-level chats start here. Existing chats keep their own selected profile.
               </div>
             </div>
@@ -32,14 +32,14 @@
             <button type="button" class="settings-advanced-toggle" @click="advOpen = !advOpen">
               <span class="material-symbols-outlined settings-advanced-toggle-icon"
                     :style="advOpen ? 'transform:rotate(90deg)' : ''">chevron_right</span>
-              <span>Advanced Settings</span>
+              <span data-i18n="Advanced Settings">Advanced Settings</span>
             </button>
 
             <div class="settings-advanced-body" x-show="advOpen" x-transition.opacity>
               <div class="field">
                 <div class="field-label">
-                  <div class="field-title">Knowledge subdirectory</div>
-                  <div class="field-description">
+                  <div class="field-title" data-i18n="Knowledge subdirectory">Knowledge subdirectory</div>
+                  <div class="field-description" data-i18n="Add a specialized knowledge folder on top of the framework defaults.">
                     Add a specialized knowledge folder on top of the framework defaults.
                   </div>
                 </div>
@@ -54,8 +54,8 @@
 
               <div class="field">
                 <div class="field-label">
-                  <div class="field-title">Inherit active project</div>
-                  <div class="field-description">
+                  <div class="field-title" data-i18n="Inherit active project">Inherit active project</div>
+                  <div class="field-description" data-i18n="Start new chats in the same project context as the current chat.">
                     Start new chats in the same project context as the current chat.
                   </div>
                 </div>

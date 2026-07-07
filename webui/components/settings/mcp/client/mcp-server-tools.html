@@ -14,14 +14,14 @@
             <div class="mcp-tools-modal">
                 <div class="mcp-tools-header">
                     <div class="mcp-tools-heading">
-                        <h3 x-text="$store.mcpServersStore.serverDetail?.name || 'MCP tools'"></h3>
-                        <p x-text="$store.mcpServersStore.serverDetail?.description || 'Tools exposed by this MCP server.'"></p>
+                        <h3 x-text="$store.mcpServersStore.serverDetail?.name || $store.mcpServersStore.localizeText('MCP tools')"></h3>
+                        <p x-text="$store.mcpServersStore.serverDetail?.description || $store.mcpServersStore.localizeText('Tools exposed by this MCP server.')"></p>
                     </div>
                     <div class="mcp-tools-actions">
                         <span class="mcp-tools-count" x-text="$store.mcpServersStore.serverDetailToolsCountLabel"></span>
                         <button type="button" class="button confirm" :disabled="$store.mcpServersStore.applying" @click="$store.mcpServersStore.applyNow()">
                             <span class="material-symbols-outlined" aria-hidden="true">check</span>
-                            <span x-text="$store.mcpServersStore.applying ? 'Applying' : 'Apply'"></span>
+                            <span x-text="$store.mcpServersStore.localizeText($store.mcpServersStore.applying ? 'Applying' : 'Apply')"></span>
                         </button>
                     </div>
                 </div>
@@ -49,12 +49,12 @@
                             <div class="tool-header">
                                 <div>
                                     <h4 x-text="tool.name"></h4>
-                                    <p class="tool-description" x-text="tool.description || 'No description provided.'"></p>
+                                    <p class="tool-description" x-text="tool.description || $store.mcpServersStore.localizeText('No description provided.')"></p>
                                 </div>
                                 <div class="mcp-tool-toggle-group">
                                     <label class="toggle plugin-status-toggle mcp-tool-toggle"
                                         :class="{ 'disabled-appearance': !$store.mcpServersStore.canConfigureServerTools($store.mcpServersStore.serverDetail?.name) }"
-                                        :title="!$store.mcpServersStore.canConfigureServerTools($store.mcpServersStore.serverDetail?.name) ? 'Add this inherited server to the current config before changing tools' : ($store.mcpServersStore.isServerToolEnabled($store.mcpServersStore.serverDetail?.name, tool.name) ? 'Disable tool' : 'Enable tool')">
+                                        :title="$store.mcpServersStore.localizeText(!$store.mcpServersStore.canConfigureServerTools($store.mcpServersStore.serverDetail?.name) ? 'Add this inherited server to the current config before changing tools' : ($store.mcpServersStore.isServerToolEnabled($store.mcpServersStore.serverDetail?.name, tool.name) ? 'Disable tool' : 'Enable tool'))">
                                         <input type="checkbox"
                                             :checked="$store.mcpServersStore.isServerToolEnabled($store.mcpServersStore.serverDetail?.name, tool.name)"
                                             :disabled="!$store.mcpServersStore.canConfigureServerTools($store.mcpServersStore.serverDetail?.name)"
@@ -63,7 +63,7 @@
                                         <span class="toggler"></span>
                                     </label>
                                     <span class="plugin-status-text"
-                                        x-text="$store.mcpServersStore.isServerToolEnabled($store.mcpServersStore.serverDetail?.name, tool.name) ? 'ON' : 'OFF'"></span>
+                                        x-text="$store.mcpServersStore.localizeText($store.mcpServersStore.isServerToolEnabled($store.mcpServersStore.serverDetail?.name, tool.name) ? 'ON' : 'OFF')"></span>
                                 </div>
                             </div>
 

@@ -16,7 +16,7 @@
       <div class="attachment-wrapper chat-more-dropdown" @click.outside="$store.chatInput.closeChatMoreMenu()"
         @keydown.escape.window="$store.chatInput.closeChatMoreMenu()">
         <button type="button" class="chat-more-trigger" @click.stop="$store.chatInput.toggleChatMoreMenu()"
-          :aria-expanded="$store.chatInput.chatMoreMenuOpen.toString()" aria-label="More actions">
+          :aria-expanded="$store.chatInput.chatMoreMenuOpen.toString()" aria-label="More actions" data-i18n-aria-label="chat.moreActions">
           <span class="material-symbols-outlined" aria-hidden="true">add</span>
         </button>
         <div class="chat-more-panel" x-show="$store.chatInput.chatMoreMenuOpen" x-transition style="display: none;">
@@ -26,7 +26,7 @@
 
       <!-- Container for composer and expand button -->
       <div id="chat-input-container">
-        <div id="chat-input" role="textbox" aria-label="Message" aria-multiline="true" contenteditable="true"
+        <div id="chat-input" role="textbox" aria-label="Message" data-i18n-aria-label="chat.message" aria-multiline="true" contenteditable="true"
           spellcheck="true" :data-placeholder="$store.chatInput.inputPlaceholder"
           @keydown="$store.chatInput.handleKeydown($event)"
           @input="$store.chatInput.handleInput($event)"
@@ -38,14 +38,14 @@
           x-html="$store.chatInput.progressPlaceholderHtml"
           :class="{ 'progress-active': $store.chatInput.progressActive }" aria-hidden="true" style="display: none;">
         </div>
-        <button id="expand-button" @click="$store.fullScreenInputModal.openModal()" aria-label="Expand input">
+        <button id="expand-button" @click="$store.fullScreenInputModal.openModal()" aria-label="Expand input" data-i18n-aria-label="chat.expandInput">
           <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
         </button>
       </div>
 
       <div id="chat-buttons-wrapper">
         <!-- Send button -->
-        <button class="chat-button" id="send-button" aria-label="Send message" @click="$store.chatInput.sendMessage()"
+        <button class="chat-button" id="send-button" aria-label="Send message" data-i18n-aria-label="chat.sendMessage" @click="$store.chatInput.sendMessage()"
           :class="$store.chatInput.sendButtonClass" :title="$store.chatInput.sendButtonTitle">
           <span class="material-symbols-outlined" x-text="$store.chatInput.sendButtonIcon"></span>
         </button>

@@ -33,19 +33,19 @@
 
       <div class="icons-section" id="hide-button">
         <!-- Sidebar Toggle Button -->
-        <button id="toggle-sidebar" class="toggle-sidebar-button" @click="$store.sidebar.toggle()" aria-label="Toggle Sidebar" aria-expanded="false">
+        <button id="toggle-sidebar" class="toggle-sidebar-button" @click="$store.sidebar.toggle()" aria-label="Toggle Sidebar" data-i18n-aria-label="sidebar.toggle" aria-expanded="false">
           <span class="material-symbols-outlined" aria-hidden="true">menu</span>
         </button>
 
-        <button class="config-button header-action-button" id="header-dashboard" @click="deselectChat()" title="Dashboard" aria-label="Dashboard" tabindex="-1">
+        <button class="config-button header-action-button" id="header-dashboard" @click="deselectChat()" title="Dashboard" aria-label="Dashboard" data-i18n-title="sidebar.dashboard" data-i18n-aria-label="sidebar.dashboard" tabindex="-1">
           <span class="material-symbols-outlined" aria-hidden="true">home</span>
         </button>
 
-        <button class="config-button header-action-button" id="header-plugins" @click="openModal('components/plugins/list/plugin-list.html')" title="Plugins" aria-label="Plugins" tabindex="-1">
+        <button class="config-button header-action-button" id="header-plugins" @click="openModal('components/plugins/list/plugin-list.html')" title="Plugins" aria-label="Plugins" data-i18n-title="sidebar.plugins" data-i18n-aria-label="sidebar.plugins" tabindex="-1">
           <span class="material-symbols-outlined" aria-hidden="true">extension</span>
         </button>
 
-        <button class="config-button header-action-button" id="header-settings" @click="openModal('settings/settings.html')" title="Settings" aria-label="Settings" tabindex="-1">
+        <button class="config-button header-action-button" id="header-settings" @click="openModal('settings/settings.html')" title="Settings" aria-label="Settings" data-i18n-title="sidebar.settings" data-i18n-aria-label="sidebar.settings" tabindex="-1">
           <span class="material-symbols-outlined" aria-hidden="true">settings</span>
         </button>
 
@@ -56,6 +56,8 @@
           @click="$store.sidebar.menuToggle($refs.menuButton)"
           title="More options"
           aria-label="More options"
+          data-i18n-title="sidebar.more"
+          data-i18n-aria-label="sidebar.more"
           tabindex="-1"
         >
           <span class="material-symbols-outlined" aria-hidden="true" :class="$store.sidebar.menuOpen ? 'rotated' : ''">expand_more</span>
@@ -71,41 +73,41 @@
       >
         <div id="sidebar-quick-actions-dropdown-slot-start"></div>
 
-        <div class="dropdown-header">Navigation</div>
+        <div class="dropdown-header" data-i18n="sidebar.navigation">Navigation</div>
 
         <button class="dropdown-item" @click="deselectChat(); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">home</span>
-          <span>Dashboard</span>
+          <span data-i18n="sidebar.dashboard">Dashboard</span>
         </button>
 
         <button class="dropdown-item" @click="$store.projects.openProjectsModal(); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">snippet_folder</span>
-          <span>Projects</span>
+          <span data-i18n="sidebar.projects">Projects</span>
         </button>
 
         <button id="sidebar-files-dropdown" class="dropdown-item" @click="$store.chatInput.browseFiles(); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">folder</span>
-          <span>Files</span>
+          <span data-i18n="sidebar.files">Files</span>
         </button>
 
         <button class="dropdown-item" @click="ensureModalOpen('settings/tunnel/remote-link.html'); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">share</span>
-          <span>Remote Control</span>
+          <span data-i18n="sidebar.remoteControl">Remote Control</span>
         </button>
 
         <button class="dropdown-item" @click="open('https://space-agent.ai/', '_blank', 'noopener,noreferrer'); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">rocket_launch</span>
-          <span>Space Agent</span>
+          <span data-i18n="sidebar.spaceAgent">Space Agent</span>
         </button>
 
         <button class="dropdown-item" @click="openModal('components/modals/scheduler/scheduler-modal.html'); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">schedule</span>
-          <span>Tasks</span>
+          <span data-i18n="sidebar.tasks">Tasks</span>
         </button>
 
         <button class="dropdown-item" @click="openModal('settings/settings.html'); $store.sidebar.menuClose()">
           <span class="material-symbols-outlined">settings</span>
-          <span>Settings</span>
+          <span data-i18n="sidebar.settings">Settings</span>
         </button>
 
         <div class="dropdown-separator"></div>
@@ -119,7 +121,7 @@
         >
           <span class="quick-actions-accordion-label">
             <span class="material-symbols-outlined">forum</span>
-            <span>Chat Actions</span>
+            <span data-i18n="sidebar.chatActions">Chat Actions</span>
           </span>
           <span class="material-symbols-outlined quick-actions-accordion-chevron">expand_more</span>
         </button>
@@ -127,22 +129,22 @@
         <div class="quick-actions-accordion-panel" x-show="$store.sidebar.isSectionOpen('chatActions')" style="display: none;">
           <button class="dropdown-item" @click="$store.chats.newChat(); $store.sidebar.menuClose()">
             <span class="material-symbols-outlined">chat_add_on</span>
-            <span>New Chat</span>
+            <span data-i18n="sidebar.newChat">New Chat</span>
           </button>
 
           <button class="dropdown-item" @click="$store.chats.loadChats(); $store.sidebar.menuClose()">
             <span class="material-symbols-outlined">folder_open</span>
-            <span>Load Chat</span>
+            <span data-i18n="sidebar.loadChat">Load Chat</span>
           </button>
 
           <button class="dropdown-item" x-show="$store.chats.selected" @click="$store.chats.saveChat(); $store.sidebar.menuClose()">
             <span class="material-symbols-outlined">save</span>
-            <span>Save Chat</span>
+            <span data-i18n="sidebar.saveChat">Save Chat</span>
           </button>
 
           <button class="dropdown-item" x-show="$store.chats.selected" @click="$confirmClick($event, () => { $store.chats.resetChat(); $store.sidebar.menuClose() })">
             <span class="material-symbols-outlined">delete_sweep</span>
-            <span>Clear Chat</span>
+            <span data-i18n="sidebar.clearChat">Clear Chat</span>
           </button>
         </div>
 
@@ -150,12 +152,12 @@
 
         <button class="dropdown-item" x-show="$store.chats.loggedIn" @click="$confirmClick($event, () => { $store.chats.logout(); $store.sidebar.menuClose() })">
           <span class="material-symbols-outlined">logout</span>
-          <span>Logout</span>
+          <span data-i18n="sidebar.logout">Logout</span>
         </button>
 
         <button class="dropdown-item" @click="$confirmClick($event, () => { $store.chats.restart(); $store.sidebar.menuClose() })">
           <span class="material-symbols-outlined">restart_alt</span>
-          <span>Restart A0</span>
+          <span data-i18n="sidebar.restart">Restart A0</span>
         </button>
 
         <div id="sidebar-quick-actions-dropdown-slot-end"></div>

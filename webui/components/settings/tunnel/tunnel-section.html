@@ -55,7 +55,7 @@
 
           <div class="remote-link-loading" x-show="$store.tunnelStore.isLoading" style="display: none;">
             <span class="material-symbols-outlined spin" aria-hidden="true">progress_activity</span>
-            <span x-text="$store.tunnelStore.loadingText || 'Preparing remote control...'"></span>
+            <span x-text="$store.tunnelStore.localizeText($store.tunnelStore.loadingText || 'Preparing remote control...')"></span>
           </div>
 
           <div class="microsoft-login-box" x-show="$store.tunnelStore.loginActionVisible" x-transition style="display: none;">
@@ -79,7 +79,7 @@
                 :class="$store.tunnelStore.codeCopied ? 'copied' : ''"
               >
                 <span class="material-symbols-outlined" aria-hidden="true" x-text="$store.tunnelStore.codeCopied ? 'check' : 'content_copy'"></span>
-                <span x-text="$store.tunnelStore.codeCopied ? 'Copied' : 'Copy code'"></span>
+                <span x-text="$store.tunnelStore.localizeText($store.tunnelStore.codeCopied ? 'Copied' : 'Copy code')"></span>
               </button>
             </div>
           </div>

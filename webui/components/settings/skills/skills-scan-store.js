@@ -8,6 +8,7 @@ import {
   toastFrontendError,
   toastFrontendWarning,
 } from "/components/notifications/notification-store.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 const SCAN_ASSET_BASE = "/components/settings/skills";
 const SCAN_POLL_INTERVAL_MS = 2000;
@@ -17,6 +18,10 @@ const SCAN_TITLE = "Skill Scanner";
 let scanChecksConfig = null;
 let scanPromptTemplate = null;
 let scanPollGeneration = 0;
+
+function tr(value) {
+  return translateStaticText(value);
+}
 
 async function fetchText(url, label) {
   const response = await fetch(url);
@@ -131,7 +136,7 @@ const model = {
       return cfg;
     } catch (error) {
       console.error("Failed to load skill scanner framework:", error);
-      void toastFrontendError(`Failed to load skill scanner: ${formatErrorMessage(error)}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Failed to load skill scanner")}: ${formatErrorMessage(error)}`, tr(SCAN_TITLE));
       return null;
     }
   },
@@ -145,7 +150,7 @@ const model = {
       return response;
     } catch (error) {
       console.error("Failed to load installed skill targets:", error);
-      void toastFrontendError(`Failed to load installed skills: ${formatErrorMessage(error)}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Failed to load installed skills")}: ${formatErrorMessage(error)}`, tr(SCAN_TITLE));
       return null;
     } finally {
       this.sectionLoading = false;
@@ -156,13 +161,13 @@ const model = {
     const response = await this.loadInstalledTargets();
     const paths = response?.paths || [];
     if (!paths.length) {
-      void toastFrontendWarning("No installed skills found to scan.", SCAN_TITLE);
+      void toastFrontendWarning(tr("No installed skills found to scan."), tr(SCAN_TITLE));
       return;
     }
 
     await this.openModalForTarget({
       target_type: "installed",
-      target_label: "Installed Agent Zero skills",
+      target_label: tr("Installed Agent Zero skills"),
       paths,
       summary: {
         skill_count: response.skill_count || 0,
@@ -188,7 +193,7 @@ const model = {
 
   async openForUploadedFile(file, metadata = {}) {
     if (!file) {
-      void toastFrontendError("Select a skills .zip file first", SCAN_TITLE);
+      void toastFrontendError(tr("Select a skills .zip file first"), tr(SCAN_TITLE));
       return false;
     }
 
@@ -204,7 +209,7 @@ const model = {
         body: formData,
       });
       const result = await response.json();
-      if (!result?.success) throw new Error(result?.error || "Failed to prepare skill scan");
+      if (!result?.success) throw new Error(result?.error || tr("Failed to prepare skill scan"));
 
       await this.openModalForTarget({
         ...result,
@@ -218,7 +223,7 @@ const model = {
       return true;
     } catch (error) {
       console.error("Failed to prepare uploaded skill scan:", error);
-      void toastFrontendError(`Skill scan failed: ${formatErrorMessage(error)}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Skill scan failed")}: ${formatErrorMessage(error)}`, tr(SCAN_TITLE));
       return false;
     } finally {
       this.preparingUpload = false;
@@ -238,7 +243,7 @@ const model = {
     const targetText = paths.length ? paths.join("\n") : fallbackText;
 
     this.targetType = target.target_type || inferTargetType(targetText);
-    this.targetLabel = target.target_label || target.label || targetText || "Manual target";
+    this.targetLabel = target.target_label || target.label || targetText || tr("Manual target");
     this.targetText = targetText;
     this.targetSummary = JSON.stringify(target.summary || {}, null, 2);
     this.cleanupPaths = Array.isArray(target.cleanup_paths) ? target.cleanup_paths.filter(Boolean) : [];
@@ -301,7 +306,7 @@ const model = {
       this.scanPrompt = prompt;
     } catch (error) {
       console.error("Failed to build skill scan prompt:", error);
-      void toastFrontendError(`Failed to build scan prompt: ${formatErrorMessage(error)}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Failed to build scan prompt")}: ${formatErrorMessage(error)}`, tr(SCAN_TITLE));
     }
   },
 
@@ -309,7 +314,7 @@ const model = {
     try {
       await navigator.clipboard.writeText(this.scanPrompt || "");
     } catch {
-      void toastFrontendError("Failed to copy the scan prompt", SCAN_TITLE);
+      void toastFrontendError(tr("Failed to copy the scan prompt"), tr(SCAN_TITLE));
     }
   },
 
@@ -319,7 +324,7 @@ const model = {
 
     const prompt = String(this.scanPrompt || "").trim();
     if (!prompt) {
-      void toastFrontendError("Scan prompt is empty", SCAN_TITLE);
+      void toastFrontendError(tr("Scan prompt is empty"), tr(SCAN_TITLE));
       return;
     }
 
@@ -329,7 +334,7 @@ const model = {
     let ctxId = "";
     try {
       const resp = await api.callJsonApi("/chat_create", {});
-      if (!resp?.ok || !resp.ctxid) throw new Error(resp?.message || "Failed to create scan chat");
+      if (!resp?.ok || !resp.ctxid) throw new Error(resp?.message || tr("Failed to create scan chat"));
       ctxId = resp.ctxid;
       this.scanCtxId = ctxId;
       await api.callJsonApi("/message_queue_add", { context: ctxId, text: prompt });
@@ -339,7 +344,7 @@ const model = {
     } catch (error) {
       this.agentScanning = false;
       console.error("Skill agent scan failed:", error);
-      void toastFrontendError(`Scan failed: ${formatErrorMessage(error)}`, SCAN_TITLE);
+      void toastFrontendError(`${tr("Scan failed")}: ${formatErrorMessage(error)}`, tr(SCAN_TITLE));
     }
   },
 
@@ -349,7 +354,7 @@ const model = {
     while (gen === scanPollGeneration) {
       if (Date.now() >= deadline) {
         this.agentScanning = false;
-        void toastFrontendError("Scan timed out while waiting for Agent Zero", SCAN_TITLE);
+        void toastFrontendError(tr("Scan timed out while waiting for Agent Zero"), tr(SCAN_TITLE));
         return;
       }
       await sleep(SCAN_POLL_INTERVAL_MS);

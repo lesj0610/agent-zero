@@ -4,39 +4,39 @@
 </head>
 
 <body>
-  <div x-data>
+  <div x-data data-i18n-scope="settings">
     <template x-if="config">
       <div class="plugin-config-page">
-        <div class="section-title">Whisper STT</div>
-        <div class="section-description">
+        <div class="section-title" data-i18n="Whisper STT">Whisper STT</div>
+        <div class="section-description" data-i18n="Configure the built-in Whisper speech-to-text provider. Browser microphone device selection stays local to the Web UI and is managed from the plugin status panel.">
           Configure the built-in Whisper speech-to-text provider. Browser microphone
           device selection stays local to the Web UI and is managed from the plugin status panel.
         </div>
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Model Size</div>
-            <div class="field-description">
+            <div class="field-title" data-i18n="Model Size">Model Size</div>
+            <div class="field-description" data-i18n="Whisper model variant loaded by the backend runtime.">
               Whisper model variant loaded by the backend runtime.
             </div>
           </div>
           <div class="field-control">
             <select x-model="config.model_size">
-              <option value="tiny">Tiny</option>
-              <option value="base">Base</option>
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-              <option value="turbo">Turbo</option>
+              <option value="tiny" data-i18n="Tiny">Tiny</option>
+              <option value="base" data-i18n="Base">Base</option>
+              <option value="small" data-i18n="Small">Small</option>
+              <option value="medium" data-i18n="Medium">Medium</option>
+              <option value="large" data-i18n="Large">Large</option>
+              <option value="turbo" data-i18n="Turbo">Turbo</option>
             </select>
           </div>
         </div>
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Language</div>
+            <div class="field-title" data-i18n="Language">Language</div>
             <div class="field-description">
-              Language hint forwarded to Whisper. Use <code>auto</code> to let Whisper detect it.
+              <span data-i18n="Language hint forwarded to Whisper. Set language to">Language hint forwarded to Whisper. Set language to</span> <code>auto</code><span data-i18n=" to let Whisper detect it."> to let Whisper detect it.</span>
             </div>
           </div>
           <div class="field-control">
@@ -46,23 +46,23 @@
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Voice Message Handling</div>
-            <div class="field-description">
+            <div class="field-title" data-i18n="Voice Message Handling">Voice Message Handling</div>
+            <div class="field-description" data-i18n="Choose whether final transcriptions are sent immediately or left in the composer for review.">
               Choose whether final transcriptions are sent immediately or left in the composer for review.
             </div>
           </div>
           <div class="field-control">
             <select x-model="config.message_mode">
-              <option value="send">Send immediately</option>
-              <option value="draft">Draft in composer</option>
+              <option value="send" data-i18n="Send immediately">Send immediately</option>
+              <option value="draft" data-i18n="Draft in composer">Draft in composer</option>
             </select>
           </div>
         </div>
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Silence Threshold</div>
-            <div class="field-description">
+            <div class="field-title" data-i18n="Silence Threshold">Silence Threshold</div>
+            <div class="field-description" data-i18n="Minimum detected signal before voice input switches from listening to recording.">
               Minimum detected signal before voice input switches from listening to recording.
             </div>
           </div>
@@ -74,8 +74,8 @@
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Silence Duration</div>
-            <div class="field-description">
+            <div class="field-title" data-i18n="Silence Duration">Silence Duration</div>
+            <div class="field-description" data-i18n="Milliseconds of silence required before the recording enters the waiting phase.">
               Milliseconds of silence required before the recording enters the waiting phase.
             </div>
           </div>
@@ -86,8 +86,8 @@
 
         <div class="field">
           <div class="field-label">
-            <div class="field-title">Waiting Timeout</div>
-            <div class="field-description">
+            <div class="field-title" data-i18n="Waiting Timeout">Waiting Timeout</div>
+            <div class="field-description" data-i18n="Milliseconds to wait after silence before audio is sent for transcription.">
               Milliseconds to wait after silence before audio is sent for transcription.
             </div>
           </div>

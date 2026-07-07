@@ -4,45 +4,45 @@
   </head>
 
   <body>
-    <div x-data>
+    <div x-data data-i18n-scope="settings">
       <template x-if="$store.settings">
         <div>
           <nav>
             <ul>
               <li>
                 <a href="#section-agent-config">
-                  <img src="/public/agent.svg" alt="Agent Config" />
-                  <span>Agent Config</span>
+                  <img src="/public/agent.svg" alt="Agent Config" data-i18n-alt="Agent Config" />
+                  <span data-i18n="Agent Config">Agent Config</span>
                 </a>
               </li>
               <li>
                 <a href="#section-models-summary">
-                  <img src="/public/chat_model.svg" alt="Models" />
-                  <span>Models</span>
+                  <img src="/public/chat_model.svg" alt="Models" data-i18n-alt="Models" />
+                  <span data-i18n="Models">Models</span>
                 </a>
               </li>
               <li>
                 <a href="#section-voice">
-                  <img src="/public/speech.svg" alt="Voice" />
-                  <span>Voice</span>
+                  <img src="/public/speech.svg" alt="Voice" data-i18n-alt="Voice" />
+                  <span data-i18n="Voice">Voice</span>
                 </a>
               </li>
               <li>
                 <a href="#section-workdir">
-                  <img src="/public/folder.svg" alt="Workdir" />
-                  <span>Workdir</span>
+                  <img src="/public/folder.svg" alt="Workdir" data-i18n-alt="Workdir" />
+                  <span data-i18n="Workdir">Workdir</span>
                 </a>
               </li>
               <li>
                 <a href="#section-locale">
                   <span class="material-symbols-outlined" aria-hidden="true">language</span>
-                  <span>Locale</span>
+                  <span data-i18n="Locale">Locale</span>
                 </a>
               </li>
               <li>
                 <a href="#section-agent-plugins">
                   <span class="material-symbols-outlined" aria-hidden="true">extension</span>
-                  <span>Plugins</span>
+                  <span data-i18n="Plugins">Plugins</span>
                 </a>
               </li>
             </ul>

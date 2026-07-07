@@ -1,6 +1,7 @@
 // Import the component loader and page utilities
 import { importComponent } from "/js/components.js";
 import { callJsExtensions } from "/js/extensions.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 // Modal functionality
 const modalStack = [];
@@ -295,8 +296,10 @@ export async function openModal(modalPath, beforeClose = null) {
       // Use importComponent which now returns the parsed document
       importComponent(componentPath, modal.body)
         .then(async (doc) => {
-          // Set the title from the document
-          modal.title.innerHTML = doc.title || modalPath;
+          // Some modal components set a more specific title while mounting.
+          if (!modal.title.textContent.trim()) {
+            modal.title.textContent = translateStaticText(doc.title || modalPath);
+          }
           const htmlElement = doc.documentElement;
           if (htmlElement && htmlElement.classList) {
             const inner = modal.element.querySelector(".modal-inner");

@@ -3,7 +3,7 @@
   import { store } from "/plugins/_model_config/webui/model-config-store.js";
 </script>
 
-<div x-data>
+<div x-data data-i18n-scope="settings">
 <template x-if="$store.modelConfig">
 <div x-data="{ showDropdown: false, showProfileDropdown: false }"
      x-init="
@@ -32,13 +32,13 @@
               <div class="model-switcher-active-pills">
                 <template x-if="$store.modelConfig.getActiveModels().main">
                   <div class="model-pill">
-                    <span class="model-pill-role">Main</span>
+                    <span class="model-pill-role" data-i18n="Main">Main</span>
                     <span class="model-pill-name" x-text="$store.modelConfig.getActiveModels().main.name"></span>
                   </div>
                 </template>
                 <template x-if="$store.modelConfig.getActiveModels().utility">
                   <div class="model-pill">
-                    <span class="model-pill-role">Util</span>
+                    <span class="model-pill-role" data-i18n="Util">Util</span>
                     <span class="model-pill-name" x-text="$store.modelConfig.getActiveModels().utility.name"></span>
                   </div>
                 </template>
@@ -54,14 +54,14 @@
                   showDropdown = false;
                 ">
                   <span class="material-symbols-outlined" style="font-size: 15px;">undo</span>
-                  <span>Use Default</span>
+                  <span data-i18n="Use Default">Use Default</span>
                 </div>
               </template>
               <div class="model-switcher-divider" x-show="$store.modelConfig.switcherOverride"></div>
 
               <!-- No presets message -->
               <template x-if="$store.modelConfig.switcherPresets.length === 0">
-                <div class="model-switcher-item disabled">No presets configured</div>
+                <div class="model-switcher-item disabled" data-i18n="No presets configured">No presets configured</div>
               </template>
 
               <!-- Preset list -->
@@ -76,7 +76,7 @@
                   <div class="model-switcher-preset-models">
                     <template x-if="preset.chat?.name">
                       <div class="model-switcher-model-row">
-                        <span class="model-switcher-model-label">Main</span>
+                        <span class="model-switcher-model-label" data-i18n="Main">Main</span>
                         <span class="model-switcher-model-value">
                           <span x-text="preset.chat.provider" style="opacity:0.5;"></span>
                           <span style="opacity:0.3; margin:0 3px;">/</span>
@@ -86,7 +86,7 @@
                     </template>
                     <template x-if="preset.utility?.name">
                       <div class="model-switcher-model-row">
-                        <span class="model-switcher-model-label">Utility</span>
+                        <span class="model-switcher-model-label" data-i18n="Utility">Utility</span>
                         <span class="model-switcher-model-value">
                           <span x-text="preset.utility.provider" style="opacity:0.5;"></span>
                           <span style="opacity:0.3; margin:0 3px;">/</span>
@@ -105,7 +105,7 @@
                 showDropdown = false;
               ">
                 <span class="material-symbols-outlined" style="font-size: 14px;">tune</span>
-                <span>Edit Presets</span>
+                <span data-i18n="Edit Presets">Edit Presets</span>
               </div>
             </div>
           </div>
@@ -115,6 +115,7 @@
           <div class="agent-profile-anchor" @click.outside="showProfileDropdown = false">
             <button class="btn-icon-action agent-profile-btn"
                     title="Active agent profile"
+                    data-i18n-title="Active agent profile"
                     @click="showProfileDropdown = !showProfileDropdown; showDropdown = false">
               <span class="material-symbols-outlined" style="font-size: 15px;">assignment_ind</span>
               <span class="agent-profile-label"
@@ -129,13 +130,13 @@
                   .then(ok => { if (ok) showProfileDropdown = false; });
               ">
                 <span class="material-symbols-outlined" style="font-size: 15px;">add</span>
-                <span>Create new Agent Profile</span>
+                <span data-i18n="Create new Agent Profile">Create new Agent Profile</span>
               </button>
 
               <div class="model-switcher-divider" style="opacity:0.2;"></div>
 
               <template x-if="$store.modelConfig.agentProfilesLoading">
-                <div class="model-switcher-item disabled">Loading profiles...</div>
+                <div class="model-switcher-item disabled" data-i18n="Loading profiles...">Loading profiles...</div>
               </template>
 
               <template x-for="profile in $store.modelConfig.getAgentProfileList($store.chats.selectedContext.agent_profile, $store.chats.selectedContext.agent_profile_label)" :key="profile.key">
@@ -162,7 +163,7 @@
                 showProfileDropdown = false;
               ">
                 <span class="material-symbols-outlined" style="font-size: 14px;">settings</span>
-                <span>Agent Config</span>
+                <span data-i18n="Agent Config">Agent Config</span>
               </button>
             </div>
           </div>

@@ -1,6 +1,11 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as api from "/js/api.js";
 import { store as skillsScanStore } from "/components/settings/skills/skills-scan-store.js";
+import { translateStaticText } from "/js/i18n/index.js";
+
+function tr(value) {
+  return translateStaticText(value);
+}
 
 function sanitizeNamespace(text) {
   if (!text) return "";
@@ -91,13 +96,13 @@ const model = {
 
   async previewImport() {
     if (!this.skillsFile) {
-      this.error = "Please select a skills .zip file first";
+      this.error = tr("Please select a skills .zip file first");
       return;
     }
 
     try {
       this.loading = true;
-      this.loadingMessage = "Previewing skills import...";
+      this.loadingMessage = tr("Previewing skills import...");
       this.error = "";
       this.preview = null;
 
@@ -108,7 +113,7 @@ const model = {
 
       const result = await response.json();
       if (!result.success) {
-        this.error = result.error || "Preview failed";
+        this.error = result.error || tr("Preview failed");
         return;
       }
 
@@ -116,7 +121,7 @@ const model = {
       // normalize namespace (server may sanitize)
       if (result.namespace) this.namespace = result.namespace;
     } catch (e) {
-      this.error = `Preview error: ${e.message}`;
+      this.error = `${tr("Preview error")}: ${e.message}`;
     } finally {
       this.loading = false;
       this.loadingMessage = "";
@@ -125,7 +130,7 @@ const model = {
 
   async scanSelectedFile() {
     if (!this.skillsFile) {
-      this.error = "Please select a skills .zip file first";
+      this.error = tr("Please select a skills .zip file first");
       return;
     }
 
@@ -136,13 +141,13 @@ const model = {
 
   async performImport() {
     if (!this.skillsFile) {
-      this.error = "Please select a skills .zip file first";
+      this.error = tr("Please select a skills .zip file first");
       return;
     }
 
     try {
       this.loading = true;
-      this.loadingMessage = "Importing skills...";
+      this.loadingMessage = tr("Importing skills...");
       this.error = "";
       this.result = null;
 
@@ -153,7 +158,7 @@ const model = {
 
       const result = await response.json();
       if (!result.success) {
-        this.error = result.error || "Import failed";
+        this.error = result.error || tr("Import failed");
         return;
       }
 
@@ -161,12 +166,12 @@ const model = {
       this.preview = result; // keep last info visible
       if (window.toastFrontendInfo) {
         window.toastFrontendInfo(
-          `Imported ${result.imported_count} skill folder(s)`,
-          "Skills Import"
+          `${tr("Imported")} ${result.imported_count} ${tr("skill folder(s)")}`,
+          tr("Skills Import")
         );
       }
     } catch (e) {
-      this.error = `Import error: ${e.message}`;
+      this.error = `${tr("Import error")}: ${e.message}`;
     } finally {
       this.loading = false;
       this.loadingMessage = "";

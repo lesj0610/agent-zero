@@ -8,6 +8,7 @@
 
 <body>
   <div x-data
+       data-i18n-scope="settings"
        x-init="
          await $store.modelConfig.ensureLoaded();
          $store.modelConfig.resetApiKeyDrafts();
@@ -18,7 +19,7 @@
       <div class="model-config-sections">
 
         <!-- Model Sections (Main, Utility, Embedding) -->
-        <template x-for="section in $store.modelConfig.MODEL_SECTIONS" :key="section.key">
+        <template x-for="section in $store.modelConfig.getModelSections()" :key="section.key">
           <div class="model-section"
                x-data="{ get model() { return config[section.key]; }, modelType: section.key.replace('_model', ''), providers: $store.modelConfig.getProviders(section.key), searchType: $store.modelConfig.getSearchType(section.key), apiKeyMode: 'store' }">
             <div class="section-title" x-text="section.title"></div>
@@ -30,12 +31,12 @@
 
         <!-- Per-Chat Override -->
         <div class="model-section">
-          <div class="section-title">Per-Chat Override</div>
-          <div class="section-description">Allow switching model presets from the chat navigation bar. New chats inherit the active preset.</div>
+          <div class="section-title" data-i18n="Per-Chat Override">Per-Chat Override</div>
+          <div class="section-description" data-i18n="Allow switching model presets from the chat navigation bar. New chats inherit the active preset.">Allow switching model presets from the chat navigation bar. New chats inherit the active preset.</div>
           <div class="field">
             <div class="field-label">
-              <div class="field-title">Enable model switcher</div>
-              <div class="field-description">Show a preset switcher in the chat navigation bar. Overrides main and utility model for the current chat.</div>
+              <div class="field-title" data-i18n="Enable model switcher">Enable model switcher</div>
+              <div class="field-description" data-i18n="Show a preset switcher in the chat navigation bar. Overrides main and utility model for the current chat.">Show a preset switcher in the chat navigation bar. Overrides main and utility model for the current chat.</div>
             </div>
             <div class="field-control">
               <label class="toggle">
@@ -47,7 +48,7 @@
           <div class="override-presets-link" x-show="config.allow_chat_override">
             <button class="text-button" @click="openModal('/plugins/_model_config/webui/main.html')">
               <span class="material-symbols-outlined">tune</span>
-              <span>Edit Presets</span>
+              <span data-i18n="Edit Presets">Edit Presets</span>
             </button>
           </div>
         </div>

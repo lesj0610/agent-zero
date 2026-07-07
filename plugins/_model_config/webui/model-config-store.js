@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import { fetchApi } from "/js/api.js";
 import { store as pluginSettingsStore } from "/components/plugins/plugin-settings-store.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import { apiKeysState, apiKeysMethods } from "/plugins/_model_config/webui/api-keys-mixin.js";
 import { switcherState, switcherMethods } from "/plugins/_model_config/webui/switcher-mixin.js";
 
@@ -178,7 +179,36 @@ export const store = createStore("modelConfig", {
   // Switcher state (from mixin)
   ...switcherState,
 
-  init() {},
+  uiLocale: "",
+
+  init() {
+    this.uiLocale = globalThis.Alpine?.store?.("i18n")?.locale || "";
+    document.addEventListener("a0:locale-changed", (event) => {
+      this.uiLocale = event.detail?.locale || globalThis.Alpine?.store?.("i18n")?.locale || "";
+    });
+  },
+
+  localizeText(value = "") {
+    this.uiLocale;
+    return translateStaticText(value);
+  },
+
+  getModelSections() {
+    this.uiLocale;
+    return MODEL_SECTIONS.map(section => ({
+      ...section,
+      title: translateStaticText(section.title),
+      desc: translateStaticText(section.desc),
+    }));
+  },
+
+  presetDisplayName(preset) {
+    return preset?.name || this.localizeText("(unnamed)");
+  },
+
+  defaultPresetName(index) {
+    return `${this.localizeText("Preset")} ${index}`;
+  },
 
   // ── API Keys methods (from mixin) ──
   ...apiKeysMethods,
@@ -308,10 +338,10 @@ export const store = createStore("modelConfig", {
       });
       this.globalPresets = presets;
       this.switcherPresets = presets.filter(p => p.name);
-      justToast('Presets saved');
+      justToast(translateStaticText('Presets saved'));
     } catch (e) {
       console.error('Failed to save global presets:', e);
-      justToast('Failed to save presets');
+      justToast(translateStaticText('Failed to save presets'));
     }
   },
 
@@ -431,9 +461,9 @@ export const store = createStore("modelConfig", {
     const embedP = data.embedding_providers || [];
     const label = (list, id) => (list.find(x => x.value === id) || {}).label || id || '\u2014';
     return [
-      { icon: 'chat', title: 'Main', cfg: cfg.chat_model, pList: chatP },
-      { icon: 'manufacturing', title: 'Utility', cfg: cfg.utility_model, pList: chatP },
-      { icon: 'database', title: 'Embedding', cfg: cfg.embedding_model, pList: embedP },
+      { icon: 'chat', title: translateStaticText('Main'), cfg: cfg.chat_model, pList: chatP },
+      { icon: 'manufacturing', title: translateStaticText('Utility'), cfg: cfg.utility_model, pList: chatP },
+      { icon: 'database', title: translateStaticText('Embedding'), cfg: cfg.embedding_model, pList: embedP },
     ].map(s => ({ icon: s.icon, title: s.title, provider: label(s.pList, s.cfg?.provider), name: s.cfg?.name || '\u2014' }));
   },
 
@@ -470,7 +500,9 @@ export const store = createStore("modelConfig", {
 
   async openConfigFromSummary() {
     try {
-      await pluginSettingsStore.openConfig('_model_config');
+      await pluginSettingsStore.openConfig('_model_config', '', '', {
+        title: translateStaticText('Model Configuration'),
+      });
     } finally {
       await this.refreshModelsSummary();
     }

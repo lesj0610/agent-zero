@@ -5,6 +5,7 @@ import { openLatest as openLatestSurface } from "/js/surfaces.js";
 import { store as messageQueueStore } from "/components/chat/message-queue/message-queue-store.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
+import { getCurrentLocale, t } from "/js/i18n/index.js";
 
 const ICON_MARKER_RE = /icon:\/\/([a-zA-Z0-9_]+)(\[(?:\\.|[^\]])*\])?/g;
 const FENCE_LINE_RE = /^```([A-Za-z0-9_-]*)?$/;
@@ -60,6 +61,8 @@ const model = {
   chatMoreMenuOpen: false,
   progressText: "",
   progressActive: false,
+  uiLocale: getCurrentLocale(),
+  _localeChangeHandler: null,
 
   get message() {
     return this._message;
@@ -89,11 +92,12 @@ const model = {
   },
 
   get inputPlaceholder() {
-    if (!chatsStore.selected) return "Ask anything to start a new chat";
+    this.uiLocale;
+    if (!chatsStore.selected) return t("chat.placeholder.start", "Ask anything to start a new chat");
     const state = this._getSendState();
-    if (state === "all") return "Press Enter to send queued messages";
+    if (state === "all") return t("chat.placeholder.queued", "Press Enter to send queued messages");
     if (this.showProgressPlaceholder) return "";
-    return "Type your message here...";
+    return t("chat.placeholder.message", "Type your message here...");
   },
 
   get showProgressPlaceholder() {
@@ -130,15 +134,22 @@ const model = {
 
   // Computed: send button title
   get sendButtonTitle() {
+    this.uiLocale;
     const state = this._getSendState();
-    if (state === "all") return "Send all queued messages";
-    if (state === "queue") return "Add to queue";
-    return "Send message";
+    if (state === "all") return t("chat.sendAllQueued", "Send all queued messages");
+    if (state === "queue") return t("chat.addToQueue", "Add to queue");
+    return t("chat.sendMessage", "Send message");
   },
 
   init() {
     console.log("Input store initialized");
-    // Event listeners are now handled via Alpine directives in the component
+    if (!this._localeChangeHandler) {
+      this._localeChangeHandler = (event) => {
+        this.uiLocale = event?.detail?.locale || getCurrentLocale();
+      };
+      document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+    }
+    // Other event listeners are handled via Alpine directives in the component.
   },
 
   async sendMessage() {
@@ -208,7 +219,7 @@ const model = {
     code.dataset.codeContent = "true";
     code.contentEditable = "true";
     code.spellcheck = false;
-    code.setAttribute("aria-label", "Code block");
+    code.setAttribute("aria-label", t("chat.codeBlock", "Code block"));
     block.append(code);
 
     return block;

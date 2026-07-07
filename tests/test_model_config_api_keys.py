@@ -245,13 +245,13 @@ def test_model_config_primary_context_controls_are_outside_advanced_settings():
     model_field_path = PROJECT_ROOT / "plugins" / "_model_config" / "webui" / "model-field.html"
     content = model_field_path.read_text(encoding="utf-8")
 
-    vision_start = content.index('<div class="field-title">Supports Vision</div>')
-    context_size_start = content.index('<div class="field-title">Context window size</div>')
+    vision_start = content.index('<div class="field-title" data-i18n="Supports Vision">Supports Vision</div>')
+    context_size_start = content.index('<div class="field-title" data-i18n="Context window size">Context window size</div>')
     advanced_start = content.index("<!-- Advanced Settings (collapsed by default) -->")
-    max_embeds_start = content.index('<div class="field-title">Max embeds</div>')
+    max_embeds_start = content.index('<div class="field-title" data-i18n="Max embeds">Max embeds</div>')
 
-    assert content.count('<div class="field-title">Supports Vision</div>') == 1
-    assert content.count('<div class="field-title">Context window size</div>') == 1
+    assert content.count('<div class="field-title" data-i18n="Supports Vision">Supports Vision</div>') == 1
+    assert content.count('<div class="field-title" data-i18n="Context window size">Context window size</div>') == 1
     assert vision_start < advanced_start
     assert context_size_start < advanced_start
     assert advanced_start < max_embeds_start

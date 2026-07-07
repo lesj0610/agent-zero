@@ -15,11 +15,11 @@
 
                 <main class="welcome-shell">
                     <header class="welcome-hero">
-                        <h1>Hello! I'm Agent Zero <span aria-hidden="true">&#128075;</span></h1>
+                        <h1><span data-i18n="welcome.title">Hello! I'm Agent Zero</span> <span aria-hidden="true">&#128075;</span></h1>
                         <p x-text="$store.welcomeStore.heroSubtitle"></p>
                     </header>
 
-                    <section class="welcome-composer" aria-label="Start a new chat">
+                    <section class="welcome-composer" aria-label="Start a new chat" data-i18n-aria-label="welcome.startChat">
                         <x-component path="chat/attachments/inputPreview.html"></x-component>
                         <x-component path="chat/input/chat-bar-input.html"></x-component>
                     </section>
@@ -52,7 +52,9 @@
                                             x-show="banner.dismissible !== false"
                                             @click.stop="$store.welcomeStore.dismissBanner(banner.id)"
                                             title="Dismiss"
-                                            aria-label="Dismiss">
+                                            aria-label="Dismiss"
+                                            data-i18n-title="welcome.dismiss"
+                                            data-i18n-aria-label="welcome.dismiss">
                                         <span class="material-symbols-outlined">close</span>
                                     </button>
                                 </article>
@@ -66,67 +68,67 @@
                                 :disabled="$store.welcomeStore.bannersLoading"
                                 @click="$store.welcomeStore.undismissBanners()">
                             <span class="material-symbols-outlined">undo</span>
-                            <span>Show dismissed notices</span>
+                            <span data-i18n="welcome.showDismissed">Show dismissed notices</span>
                         </button>
                     </section>
 
                     <section class="welcome-quick-section">
-                        <h2>Quick Actions</h2>
+                        <h2 data-i18n="welcome.quickActions">Quick Actions</h2>
                         <div class="welcome-actions">
                             <x-extension id="welcome-actions-start"></x-extension>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('projects')">
                                 <span class="material-symbols-outlined welcome-action-icon">folder</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Projects</span>
-                                    <span class="welcome-action-description">Organize and track your work.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.projects.title">Projects</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.projects.description">Organize and track your work.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('memory')">
                                 <span class="material-symbols-outlined welcome-action-icon">memory</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Memory</span>
-                                    <span class="welcome-action-description">Access saved context and knowledge.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.memory.title">Memory</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.memory.description">Access saved context and knowledge.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('scheduler')">
                                 <span class="material-symbols-outlined welcome-action-icon">schedule</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Tasks</span>
-                                    <span class="welcome-action-description">View and manage your tasks.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.tasks.title">Tasks</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.tasks.description">View and manage your tasks.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('files')">
                                 <span class="material-symbols-outlined welcome-action-icon">folder_open</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Files</span>
-                                    <span class="welcome-action-description">Search and manage your files.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.files.title">Files</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.files.description">Search and manage your files.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('settings')">
                                 <span class="material-symbols-outlined welcome-action-icon">settings</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Settings</span>
-                                    <span class="welcome-action-description">Configure Agent Zero to your preferences.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.settings.title">Settings</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.settings.description">Configure Agent Zero to your preferences.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card" @click="$store.welcomeStore.executeAction('plugins')">
                                 <span class="material-symbols-outlined welcome-action-icon">extension</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Plugins</span>
-                                    <span class="welcome-action-description">Extend Agent Zero with integrations.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.plugins.title">Plugins</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.plugins.description">Extend Agent Zero with integrations.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">chevron_right</span>
                             </button>
                             <button type="button" class="welcome-action-card is-wide" @click="$store.welcomeStore.executeAction('website')">
                                 <span class="material-symbols-outlined welcome-action-icon">language</span>
                                 <span class="welcome-action-copy">
-                                    <span class="welcome-action-title">Visit Website</span>
-                                    <span class="welcome-action-description">Explore Agent Zero online and resources.</span>
+                                    <span class="welcome-action-title" data-i18n="welcome.website.title">Visit Website</span>
+                                    <span class="welcome-action-description" data-i18n="welcome.website.description">Explore Agent Zero online and resources.</span>
                                 </span>
                                 <span class="material-symbols-outlined welcome-action-arrow">open_in_new</span>
                             </button>
@@ -140,14 +142,16 @@
                                  x-show="$store.welcomeStore.systemResourceBanner"
                                  x-transition.opacity>
                             <header class="welcome-panel-header">
-                                <h2 x-text="$store.welcomeStore.systemResourceBanner?.title || 'System Resources'"></h2>
+                                <h2 x-text="$store.welcomeStore.systemResourceTitle"></h2>
                                 <div class="welcome-panel-actions">
                                     <button class="welcome-panel-icon-button"
                                             type="button"
                                             :disabled="$store.welcomeStore.bannersLoading"
                                             @click.stop="$store.welcomeStore.refreshBanners(true)"
                                             title="Refresh"
-                                            aria-label="Refresh System Resources">
+                                            aria-label="Refresh System Resources"
+                                            data-i18n-title="welcome.refreshResources"
+                                            data-i18n-aria-label="welcome.refreshResources">
                                         <span class="material-symbols-outlined">refresh</span>
                                     </button>
                                     <button class="welcome-panel-icon-button"
@@ -155,13 +159,15 @@
                                             x-show="$store.welcomeStore.systemResourceBanner?.dismissible !== false"
                                             @click.stop="$store.welcomeStore.dismissBanner($store.welcomeStore.systemResourceBanner?.id || 'system-resources')"
                                             title="Dismiss"
-                                            aria-label="Dismiss System Resources">
+                                            aria-label="Dismiss System Resources"
+                                            data-i18n-title="welcome.dismiss"
+                                            data-i18n-aria-label="welcome.dismissResources">
                                         <span class="material-symbols-outlined">close</span>
                                     </button>
                                 </div>
                             </header>
                             <div class="welcome-system-body"
-                                 x-html="$store.welcomeStore.systemResourceBanner?.html || ''"></div>
+                                 x-html="$store.welcomeStore.systemResourceHtml"></div>
                         </article>
                     </section>
                 </main>

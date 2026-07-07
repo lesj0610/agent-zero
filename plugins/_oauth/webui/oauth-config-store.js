@@ -6,6 +6,7 @@ import {
   toastFrontendInfo,
   toastFrontendSuccess,
 } from "/components/notifications/notification-store.js";
+import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";
 
 const MODEL_CONFIG_API = "/plugins/_model_config";
 const STATUS_API = "/plugins/_oauth/status";
@@ -114,7 +115,6 @@ export const store = createStore("oauthConfig", {
   selectedProviderId: "",
   activeModelProvider: CODEX_PROVIDER,
   models: [],
-  modelSlots: MODEL_SLOTS,
   modelConfig: null,
   modelConfigLoading: false,
   modelConfigSaving: false,
@@ -134,8 +134,11 @@ export const store = createStore("oauthConfig", {
   callbackPollStartedAt: {},
   device: null,
   pollTimer: null,
+  _localeChangeHandler: null,
+  uiLocale: getCurrentLocale(),
 
   async init(config, context = null) {
+    this.bindUiLocaleRuntime();
     this.bindConfig(config);
     this.installSettingsHooks(context);
     await Promise.all([this.loadStatus(), this.loadModelConfig()]);
@@ -171,6 +174,10 @@ export const store = createStore("oauthConfig", {
     this.callbackPollTimers = {};
     this.callbackPollStartedAt = {};
     this.device = null;
+    if (this._localeChangeHandler) {
+      document.removeEventListener("a0:locale-changed", this._localeChangeHandler);
+      this._localeChangeHandler = null;
+    }
   },
 
   bindConfig(config) {
@@ -178,6 +185,28 @@ export const store = createStore("oauthConfig", {
     if (!safeConfig) return;
     if (this.config === safeConfig) return;
     this.config = safeConfig;
+  },
+
+  bindUiLocaleRuntime() {
+    if (this._localeChangeHandler || typeof document === "undefined") return;
+    this._localeChangeHandler = (event) => {
+      this.uiLocale = event?.detail?.locale || getCurrentLocale();
+    };
+    document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+  },
+
+  localizeText(value = "") {
+    this.uiLocale;
+    return translateStaticText(value);
+  },
+
+  get modelSlots() {
+    this.uiLocale;
+    return MODEL_SLOTS.map((slot) => ({
+      ...slot,
+      title: translateStaticText(slot.title),
+      description: translateStaticText(slot.description),
+    }));
   },
 
   codex() {
@@ -293,10 +322,10 @@ export const store = createStore("oauthConfig", {
   },
 
   providerStatusLabel(providerId) {
-    if (this.loadingStatus) return "Checking";
+    if (this.loadingStatus) return this.localizeText("Checking");
     const status = this.providerStatus(providerId);
-    if (!status.connected) return "Not connected";
-    return status.account_label || status.email || "Connected";
+    if (!status.connected) return this.localizeText("Not connected");
+    return status.account_label || status.email || this.localizeText("Connected");
   },
 
   providerDevice(providerId) {
@@ -329,11 +358,11 @@ export const store = createStore("oauthConfig", {
 
   providerReadinessLabel(providerId) {
     const status = this.providerStatus(providerId);
-    if (this.loadingStatus) return "Checking";
+    if (this.loadingStatus) return this.localizeText("Checking");
     if (status.connected) return this.providerStatusLabel(providerId);
-    if (!this.providerSetupReady(providerId)) return "Needs OAuth client details";
-    if (status.warning) return "Available with restrictions";
-    return "Ready to connect";
+    if (!this.providerSetupReady(providerId)) return this.localizeText("Needs OAuth client details");
+    if (status.warning) return this.localizeText("Available with restrictions");
+    return this.localizeText("Ready to connect");
   },
 
   providerSetupReady(providerId) {
@@ -350,8 +379,18 @@ export const store = createStore("oauthConfig", {
   },
 
   providerPrimaryLabel(providerId) {
-    if (this.connectingProvider === providerId) return "Waiting";
-    return this.providerSetupReady(providerId) ? "Connect" : "Configure";
+    if (this.connectingProvider === providerId) return this.localizeText("Waiting");
+    return this.localizeText(this.providerSetupReady(providerId) ? "Connect" : "Configure");
+  },
+
+  providerConnectionStateLabel(connected) {
+    return this.localizeText(connected ? "Connected" : "Available");
+  },
+
+  providerDisconnectLabel(providerId) {
+    return this.localizeText(
+      this.disconnectingProvider === providerId ? "Disconnecting" : "Disconnect",
+    );
   },
 
   providerPrimaryDisabled(providerId) {
@@ -391,8 +430,8 @@ export const store = createStore("oauthConfig", {
     const usage = this.usage(providerId);
     if (!usage?.available) return [];
     return [
-      { key: "primary", title: "Session", ...(usage.primary || {}) },
-      { key: "secondary", title: "Week", ...(usage.secondary || {}) },
+      { key: "primary", title: this.localizeText("Session"), ...(usage.primary || {}) },
+      { key: "secondary", title: this.localizeText("Week"), ...(usage.secondary || {}) },
     ].filter((window) => Number.isFinite(this.remainingPercent(window)));
   },
 
@@ -428,7 +467,7 @@ export const store = createStore("oauthConfig", {
   },
 
   usagePlanStatus() {
-    return "Provider available";
+    return this.localizeText("Provider available");
   },
 
   usagePlanNotes(entry) {
@@ -451,7 +490,9 @@ export const store = createStore("oauthConfig", {
   formatRemainingPercent(window) {
     const number = this.remainingPercent(window);
     if (!Number.isFinite(number)) return "0%";
-    return `${Math.round(number * 10) / 10}% left`;
+    return t("oauth.percentLeft", "{percent} left", {
+      percent: Math.round(number * 10) / 10,
+    });
   },
 
   formatWindowLabel(window) {
@@ -467,6 +508,12 @@ export const store = createStore("oauthConfig", {
     const hours = Math.round(minutes / 60);
     if (hours < 48) return `${hours}h`;
     return `${Math.round(hours / 24)}d`;
+  },
+
+  formatResetLabel(window) {
+    const reset = this.formatReset(window);
+    if (!reset) return "";
+    return t("oauth.resetsIn", "Resets in {time}", { time: reset });
   },
 
   installSettingsHooks(context) {
@@ -527,7 +574,7 @@ export const store = createStore("oauthConfig", {
   },
 
   providerName(provider) {
-    if (!provider) return "Not configured";
+    if (!provider) return this.localizeText("Not configured");
     const found = (modelConfigStore.chatProviders || []).find((item) => item.value === provider);
     return found?.label || this.providerLabel(provider);
   },
@@ -537,13 +584,15 @@ export const store = createStore("oauthConfig", {
   },
 
   modelProviderOptionLabel(provider) {
-    return provider?.display_name || provider?.short_name || provider?.provider_id || "Connected account";
+    return provider?.display_name || provider?.short_name || provider?.provider_id || this.localizeText("Connected account");
   },
 
   slotStatusLabel(key) {
     const slot = this.modelSlot(key);
     if (this.slotUsesOauth(key)) return "";
-    return `Currently ${this.providerName(slot.provider)}`;
+    return t("oauth.currentlyProvider", "Currently {provider}", {
+      provider: this.providerName(slot.provider),
+    });
   },
 
   slotCanUseModels(key) {
@@ -558,7 +607,17 @@ export const store = createStore("oauthConfig", {
 
   activeModelsDescription() {
     if (!this.providerConnected(this.activeModelProvider)) return "";
-    return `Available models from ${this.providerLabel(this.activeModelProvider)}`;
+    return t("oauth.availableModelsFrom", "Available models from {provider}", {
+      provider: this.providerLabel(this.activeModelProvider),
+    });
+  },
+
+  modelInputPlaceholder(key) {
+    return this.localizeText(
+      this.slotCanUseModels(key)
+        ? "Search or enter a provider model"
+        : "Choose a connected provider first",
+    );
   },
 
   markModelDirty(key) {

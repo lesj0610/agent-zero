@@ -3,6 +3,7 @@ import * as API from "/js/api.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
 import { openModal, closeModal } from "/js/modals.js";
 import { formatDateTime } from "/js/time-utils.js";
+import { translateStaticText } from "/js/i18n/index.js";
 
 const HEALTH_POLL_INTERVAL_MS = 2000;
 const HEALTH_WAIT_BUFFER_MS = 30000;
@@ -10,6 +11,10 @@ const SELF_UPDATE_OVERLAY_ID = "self-update-progress-overlay";
 const SELF_UPDATE_MODAL_PATH = "settings/external/self-update-modal.html";
 const SELF_UPDATE_MANUAL_BACKUP_MODAL_PATH = "settings/backup/backup_restore.html";
 const MIN_SELECTOR_VERSION = [1, 0];
+
+function tr(value) {
+  return translateStaticText(value);
+}
 
 const model = {
   loading: false,
@@ -56,8 +61,16 @@ const model = {
     return (
       this.info?.current?.display_version ||
       this.info?.current?.short_tag ||
-      (this.hasPendingInitialLoad ? "Loading" : "unknown")
+      (this.hasPendingInitialLoad ? tr("Loading") : tr("unknown"))
     );
+  },
+
+  localizeText(value) {
+    return tr(value);
+  },
+
+  branchSummary(branch) {
+    return `${tr("Branch")} ${branch || tr("unknown")}`;
   },
 
   get currentBranch() {
@@ -76,7 +89,7 @@ const model = {
     return (
       this.info?.main_branch_latest?.display_version ||
       this.info?.main_branch_latest?.short_tag ||
-      (this.hasPendingInitialLoad ? "Loading" : "Unavailable")
+      (this.hasPendingInitialLoad ? tr("Loading") : tr("Unavailable"))
     );
   },
 
@@ -122,7 +135,7 @@ const model = {
       versionLabels.length === 1
         ? versionLabels[0]
         : `${versionLabels.slice(0, -1).join(", ")} and ${versionLabels[versionLabels.length - 1]}`;
-    return `A newer major release line is available on this branch (${versionText}). Major upgrades require downloading a newer Docker image before using self-update.`;
+    return `${tr("A newer major release line is available on this branch")} (${versionText}). ${tr("Major upgrades require downloading a newer Docker image before using self-update.")}`;
   },
 
   get hasMajorUpgrade() {
@@ -136,13 +149,13 @@ const model = {
       versionLabels.length === 1
         ? versionLabels[0]
         : `${versionLabels.slice(0, -1).join(", ")} and ${versionLabels[versionLabels.length - 1]}`;
-    return `A newer major release line is available (${versionText}). This self-updater keeps showing only updates from the current major version. Major upgrades require a new Docker image and data migration.`;
+    return `${tr("A newer major release line is available")} (${versionText}). ${tr("This self-updater keeps showing only updates from the current major version. Major upgrades require a new Docker image and data migration.")}`;
   },
 
   get versionSelectPlaceholder() {
-    if (this.tagsLoading) return "Loading versions...";
-    if (!this.hasAvailableTags) return "No versions available";
-    return "Select a version";
+    if (this.tagsLoading) return tr("Loading versions...");
+    if (!this.hasAvailableTags) return tr("No versions available");
+    return tr("Select a version");
   },
 
   get canScheduleUpdate() {
@@ -174,14 +187,14 @@ const model = {
   },
 
   get quickStatusLabel() {
-    if (this.isCheckingStatus) return "CHECKING";
-    if (!this.isSupported) return "UNAVAILABLE";
-    if (!this.mainBranchLatestSupported) return "MAIN UNAVAILABLE";
-    if (!this.mainBranchLatestTag) return "UNAVAILABLE";
-    if (this.quickUpdateComparison === null) return "REVIEW";
-    if (this.quickUpdateComparison > 0) return "UPDATE AVAILABLE";
-    if (this.quickUpdateComparison === 0) return "UP TO DATE";
-    return "AHEAD OF MAIN";
+    if (this.isCheckingStatus) return tr("CHECKING");
+    if (!this.isSupported) return tr("UNAVAILABLE");
+    if (!this.mainBranchLatestSupported) return tr("MAIN UNAVAILABLE");
+    if (!this.mainBranchLatestTag) return tr("UNAVAILABLE");
+    if (this.quickUpdateComparison === null) return tr("REVIEW");
+    if (this.quickUpdateComparison > 0) return tr("UPDATE AVAILABLE");
+    if (this.quickUpdateComparison === 0) return tr("UP TO DATE");
+    return tr("AHEAD OF MAIN");
   },
 
   get quickBehindMinorCount() {
@@ -198,30 +211,30 @@ const model = {
 
   get quickStatusMessage() {
     if (this.isCheckingStatus) {
-      return "Checking update status...";
+      return tr("Checking update status...");
     }
     if (!this.isSupported) {
-      return "Self-update is currently available only in dockerized Agent Zero deployments that boot through /exe/run_A0.sh.";
+      return tr("Self-update is currently available only in dockerized Agent Zero deployments that boot through /exe/run_A0.sh.");
     }
     if (!this.mainBranchLatestSupported) {
-      return "The main branch is not currently available from the configured remote.";
+      return tr("The main branch is not currently available from the configured remote.");
     }
     if (!this.mainBranchLatestTag) {
-      return "No supported main-branch version could be resolved right now.";
+      return tr("No supported main-branch version could be resolved right now.");
     }
     if (this.quickUpdateComparison === null) {
-      return "The current checkout does not expose a comparable tagged version. Use Advanced if you still want to choose a target manually.";
+      return tr("The current checkout does not expose a comparable tagged version. Use Advanced if you still want to choose a target manually.");
     }
     if (this.quickUpdateComparison > 0) {
       if (this.quickBehindMinorCount !== null && this.quickBehindMinorCount <= 3) {
-        return `This instance is ${this.quickBehindMinorCount} minor version${this.quickBehindMinorCount === 1 ? "" : "s"} behind the latest release currently available on main.`;
+        return `${tr("This instance is")} ${this.quickBehindMinorCount} ${tr(this.quickBehindMinorCount === 1 ? "minor version" : "minor versions")} ${tr("behind the latest release currently available on main.")}`;
       }
-      return `This instance is significantly behind the latest release currently available on main. Restart Agent Zero to move to ${this.mainBranchLatestVersion}.`;
+      return `${tr("This instance is significantly behind the latest release currently available on main. Restart Agent Zero to move to")} ${this.mainBranchLatestVersion}.`;
     }
     if (this.quickUpdateComparison === 0) {
-      return "You already have the latest version of Agent Zero main branch";
+      return tr("You already have the latest version of Agent Zero main branch");
     }
-    return "This checkout already reports a newer tagged version than main.";
+    return tr("This checkout already reports a newer tagged version than main.");
   },
 
   get quickStatusBadgeClass() {
@@ -292,8 +305,8 @@ const model = {
       return "";
     }
     return (
-      "This update crosses into a newer major release line. If your Docker image is older, " +
-      "you may still need to update the image itself after applying the repo update."
+      tr("This update crosses into a newer major release line. If your Docker image is older, ") +
+      tr("you may still need to update the image itself after applying the repo update.")
     );
   },
 
@@ -342,9 +355,9 @@ const model = {
   formatReleaseTimestamp(value) {
     if (!value) {
       if (this.hasPendingInitialLoad) {
-        return "Loading";
+        return tr("Loading");
       }
-      return "Release date unavailable";
+      return tr("Release date unavailable");
     }
     if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
       return value;
@@ -353,7 +366,7 @@ const model = {
   },
 
   formatBranchTag(branch, tag) {
-    return `${branch || "main"} / ${tag || "None"}`;
+    return `${branch || "main"} / ${tag || tr("None")}`;
   },
 
   normalizeLastStatus(status) {
@@ -362,7 +375,7 @@ const model = {
 
   getLastStatusLabel(status) {
     const normalizedStatus = this.normalizeLastStatus(status);
-    return normalizedStatus ? normalizedStatus.replace(/_/g, " ") : "unknown";
+    return normalizedStatus ? tr(normalizedStatus.replace(/_/g, " ")) : tr("unknown");
   },
 
   getLastStatusBadgeClass(status) {
@@ -469,12 +482,12 @@ const model = {
     const title = overlay.querySelector(".self-update-progress-title");
     const detail = overlay.querySelector(".self-update-progress-detail");
     if (title) {
-      title.textContent = this.restartStatusText || "Applying self-update";
+      title.textContent = this.restartStatusText || tr("Applying self-update");
     }
     if (detail) {
       detail.textContent =
         this.restartDetailText ||
-        "Agent Zero is restarting, applying the requested release, and will reload this page when the health check responds again.";
+        tr("Agent Zero is restarting, applying the requested release, and will reload this page when the health check responds again.");
     }
   },
 
@@ -502,7 +515,7 @@ const model = {
     try {
       const response = await API.callJsonApi("self_update_get", {});
       if (!response?.success) {
-        throw new Error(response?.error || "Failed to load self-update info.");
+        throw new Error(response?.error || tr("Failed to load self-update info."));
       }
       this.info = response;
       this.majorUpgradeVersions = Array.isArray(response.major_upgrade_versions)
@@ -521,7 +534,7 @@ const model = {
       });
     } catch (error) {
       console.error("Failed to load self-update info:", error);
-      this.error = error.message || "Failed to load self-update info.";
+      this.error = error.message || tr("Failed to load self-update info.");
     } finally {
       this.loading = false;
     }
@@ -587,7 +600,7 @@ const model = {
         branch: this.form.branch,
       });
       if (!response?.success) {
-        throw new Error(response?.error || "Failed to fetch release tags.");
+        throw new Error(response?.error || tr("Failed to fetch release tags."));
       }
       if (requestId !== this._tagRequestId) {
         return;
@@ -603,7 +616,7 @@ const model = {
         return;
       }
       this.applyAvailableTags();
-      this.tagsError = error.message || "Failed to fetch release tags.";
+      this.tagsError = error.message || tr("Failed to fetch release tags.");
     } finally {
       if (requestId === this._tagRequestId) {
         this.tagsLoading = false;
@@ -657,14 +670,14 @@ const model = {
     this.saving = true;
     this.error = "";
     this.setRestartState(
-      "Preparing update",
-      "Saving the request and asking Agent Zero to restart."
+      tr("Preparing update"),
+      tr("Saving the request and asking Agent Zero to restart.")
     );
     this.ensureProgressOverlay();
     try {
       const response = await API.callJsonApi("self_update_schedule", payload);
       if (!response?.success) {
-        throw new Error(response?.error || "Failed to schedule the self-update.");
+        throw new Error(response?.error || tr("Failed to schedule the self-update."));
       }
 
       if (this.info) {
@@ -672,7 +685,7 @@ const model = {
       }
       notificationStore.frontendWarning(
         notificationMessage,
-        "Self Update",
+        tr("Self Update"),
         10,
         "self-update-restart",
         undefined,
@@ -686,7 +699,7 @@ const model = {
       this.restarting = false;
       this.resetRestartState();
       this.removeProgressOverlay();
-      this.error = error.message || "Failed to schedule the self-update.";
+      this.error = error.message || tr("Failed to schedule the self-update.");
     } finally {
       this.saving = false;
     }
@@ -694,29 +707,29 @@ const model = {
 
   async scheduleUpdate() {
     if (!this.form.branch?.trim()) {
-      this.error = "Choose a branch.";
+      this.error = tr("Choose a branch.");
       return;
     }
 
     if (!this.form.tag?.trim()) {
-      this.error = "Choose a version from the list.";
+      this.error = tr("Choose a version from the list.");
       return;
     }
 
     if (!this.isLatestSelectorTag(this.form.tag) && !this.parseSelectorTag(this.form.tag)) {
-      this.error = "Release tag must use the format vX.Y.";
+      this.error = tr("Release tag must use the format vX.Y.");
       return;
     }
 
     if (!this.isLatestSelectorTag(this.form.tag) && !this.isSupportedSelectorTag(this.form.tag)) {
-      this.error = "Release tag must be v1.0 or newer.";
+      this.error = tr("Release tag must be v1.0 or newer.");
       return;
     }
 
     if (!this.selectedTagExistsOnBranch) {
       await this.fetchTags();
       if (!this.selectedTagExistsOnBranch) {
-        this.error = `Version ${this.trimmedTag} does not exist on branch ${this.form.branch || "main"}.`;
+        this.error = `${tr("Version")} ${this.trimmedTag} ${tr("does not exist on branch")} ${this.form.branch || "main"}.`;
         return;
       }
     }
@@ -730,19 +743,19 @@ const model = {
         backup_name: this.form.backup_name,
         backup_conflict_policy: this.form.backup_conflict_policy,
       },
-      "Agent Zero is restarting to apply the requested branch and version target.",
+      tr("Agent Zero is restarting to apply the requested branch and version target."),
     );
   },
 
   async scheduleQuickUpdate() {
     if (!this.mainBranchLatestSupported || !this.mainBranchLatestTag) {
-      this.error = "Latest main-branch version is not available right now.";
+      this.error = tr("Latest main-branch version is not available right now.");
       return;
     }
 
     if (this.quickUpdateComparison === null) {
       this.error =
-        "The current checkout cannot be compared to the latest main version. Use Advanced to choose a version manually.";
+        tr("The current checkout cannot be compared to the latest main version. Use Advanced to choose a version manually.");
       return;
     }
 
@@ -760,7 +773,7 @@ const model = {
         backup_conflict_policy:
           this.info?.defaults?.backup_conflict_policy || "rename",
       },
-      "Agent Zero is restarting to apply the latest version from main.",
+      tr("Agent Zero is restarting to apply the latest version from main."),
     );
   },
 
@@ -769,8 +782,8 @@ const model = {
     this.clearReconnectTimer();
     let observedBackendUnavailable = false;
     this.setRestartState(
-      "Starting self-update",
-      "The request was saved. Agent Zero is about to restart and apply the requested branch and version target."
+      tr("Starting self-update"),
+      tr("The request was saved. Agent Zero is about to restart and apply the requested branch and version target.")
     );
     this.ensureProgressOverlay();
 
@@ -794,18 +807,18 @@ const model = {
             `Restart request returned HTTP ${restartResponse.status} while Agent Zero was shutting down. Continuing to wait for the new runtime.`
           );
           this.setRestartState(
-            "Restarting backend",
-            "Agent Zero is shutting down and applying the update. Waiting for the new runtime to come back healthy."
+            tr("Restarting backend"),
+            tr("Agent Zero is shutting down and applying the update. Waiting for the new runtime to come back healthy.")
           );
         } else {
           throw new Error(
-            `Restart request failed with HTTP ${restartResponse.status}.`
+            `${tr("Restart request failed with HTTP")} ${restartResponse.status}.`
           );
         }
       } else {
         this.setRestartState(
-          "Restarting backend",
-          "Agent Zero accepted the restart request. Waiting for the updater to take over."
+          tr("Restarting backend"),
+          tr("Agent Zero accepted the restart request. Waiting for the updater to take over.")
         );
       }
     } catch (error) {
@@ -830,8 +843,8 @@ const model = {
     const deadline = Date.now() + maxWaitMs;
     let lastError = "";
     this.setRestartState(
-      "Update in progress",
-      "Agent Zero is restarting and the updater is running. This page will reload automatically when /api/health starts responding again."
+      tr("Update in progress"),
+      tr("Agent Zero is restarting and the updater is running. This page will reload automatically when /api/health starts responding again.")
     );
 
     while (Date.now() < deadline) {
@@ -847,23 +860,23 @@ const model = {
         }
         if (response.ok) {
           this.setRestartState(
-            "Restarting backend",
-            "Waiting for Agent Zero to disconnect before reloading the page."
+            tr("Restarting backend"),
+            tr("Waiting for Agent Zero to disconnect before reloading the page.")
           );
-          lastError = "Health check is still responding before the restart has completed.";
+          lastError = tr("Health check is still responding before the restart has completed.");
         } else {
           observedBackendUnavailable = true;
           this.setRestartState(
-            "Update in progress",
-            "Agent Zero is restarting and the updater is running. This page will reload automatically when the health check becomes healthy again."
+            tr("Update in progress"),
+            tr("Agent Zero is restarting and the updater is running. This page will reload automatically when the health check becomes healthy again.")
           );
-          lastError = `Health check returned HTTP ${response.status}.`;
+          lastError = `${tr("Health check returned HTTP")} ${response.status}.`;
         }
       } catch (error) {
         observedBackendUnavailable = true;
         this.setRestartState(
-          "Update in progress",
-          "Agent Zero is temporarily unavailable while it restarts. Waiting for the new runtime to become healthy."
+          tr("Update in progress"),
+          tr("Agent Zero is temporarily unavailable while it restarts. Waiting for the new runtime to become healthy.")
         );
         lastError = error?.message || String(error);
       }
@@ -880,8 +893,8 @@ const model = {
     this.resetRestartState();
     this.removeProgressOverlay();
     this.error =
-      "Agent Zero did not come back within the expected window. It may still be rolling back. " +
-      (lastError ? `Last health check error: ${lastError}` : "");
+      tr("Agent Zero did not come back within the expected window. It may still be rolling back. ") +
+      (lastError ? `${tr("Last health check error")}: ${lastError}` : "");
     await this.refresh();
   },
 

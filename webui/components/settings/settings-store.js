@@ -6,6 +6,15 @@ import {
   setConfiguredTimeFormat,
   setConfiguredTimezone,
 } from "/js/time-utils.js";
+import {
+  getCurrentLocale,
+  getLocaleOptions,
+  getLocalePreference,
+  scheduleTranslations,
+  setLocalePreference,
+  t,
+  translateStaticText,
+} from "/js/i18n/index.js";
 
 // Constants
 const VIEW_MODE_STORAGE_KEY = "settingsActiveTab";
@@ -18,64 +27,70 @@ const TAB_ITEMS = Object.freeze([
   {
     id: "agent",
     label: "Agent Settings",
+    labelKey: "settings.nav.agent",
     icon: "smart_toy",
     sections: [
-      { id: "section-agent-config", label: "Agent Config", icon: "settings" },
-      { id: "section-models-summary", label: "Models", icon: "forum" },
-      { id: "section-voice", label: "Voice", icon: "mic" },
-      { id: "section-workdir", label: "Workdir", icon: "folder" },
-      { id: "section-locale", label: "Locale", icon: "language" },
-      { id: "section-agent-plugins", label: "Plugins", icon: "extension" },
+      { id: "section-agent-config", label: "Agent Config", labelKey: "settings.nav.agentConfig", icon: "settings" },
+      { id: "section-models-summary", label: "Models", labelKey: "settings.nav.models", icon: "forum" },
+      { id: "section-voice", label: "Voice", labelKey: "settings.nav.voice", icon: "mic" },
+      { id: "section-workdir", label: "Workdir", labelKey: "settings.nav.workdir", icon: "folder" },
+      { id: "section-locale", label: "Locale", labelKey: "settings.nav.locale", icon: "language" },
+      { id: "section-agent-plugins", label: "Plugins", labelKey: "settings.nav.plugins", icon: "extension" },
     ],
   },
   {
     id: "skills",
     label: "Skills",
+    labelKey: "settings.nav.skills",
     icon: "school",
     sections: [
-      { id: "section-skills-list", label: "List Skills", icon: "view_list" },
-      { id: "section-skills-import", label: "Import Skills", icon: "upload_file" },
-      { id: "section-skills-scan", label: "Scan Skills", icon: "radar" },
+      { id: "section-skills-list", label: "List Skills", labelKey: "settings.nav.listSkills", icon: "view_list" },
+      { id: "section-skills-import", label: "Import Skills", labelKey: "settings.nav.importSkills", icon: "upload_file" },
+      { id: "section-skills-scan", label: "Scan Skills", labelKey: "settings.nav.scanSkills", icon: "radar" },
     ],
   },
   {
     id: "external",
     label: "External Services",
+    labelKey: "settings.nav.external",
     icon: "cloud_sync",
     sections: [
-      { id: "section-api-keys", label: "API Keys", icon: "key" },
-      { id: "section-litellm", label: "LiteLLM", icon: "tune" },
-      { id: "section-secrets", label: "Secrets", icon: "lock" },
-      { id: "section-auth", label: "Authentication", icon: "passkey" },
-      { id: "section-external-api", label: "External API", icon: "api" },
-      { id: "section-tunnel", label: "Remote Control", icon: "share" },
+      { id: "section-api-keys", label: "API Keys", labelKey: "settings.nav.apiKeys", icon: "key" },
+      { id: "section-litellm", label: "LiteLLM", labelKey: "settings.nav.litellm", icon: "tune" },
+      { id: "section-secrets", label: "Secrets", labelKey: "settings.nav.secrets", icon: "lock" },
+      { id: "section-auth", label: "Authentication", labelKey: "settings.nav.auth", icon: "passkey" },
+      { id: "section-external-api", label: "External API", labelKey: "settings.nav.externalApi", icon: "api" },
+      { id: "section-tunnel", label: "Remote Control", labelKey: "settings.nav.remoteControl", icon: "share" },
     ],
   },
   {
     id: "mcp",
     label: "MCP/A2A",
+    labelKey: "settings.nav.mcp",
     icon: "hub",
     sections: [
-      { id: "section-mcp-client", label: "External MCP Servers", icon: "hub" },
-      { id: "section-mcp-server", label: "A0 MCP Server", icon: "settings_input_antenna" },
-      { id: "section-a2a-server", label: "A0 A2A Server", icon: "conversion_path" },
+      { id: "section-mcp-client", label: "External MCP Servers", labelKey: "settings.nav.externalMcp", icon: "hub" },
+      { id: "section-mcp-server", label: "A0 MCP Server", labelKey: "settings.nav.a0Mcp", icon: "settings_input_antenna" },
+      { id: "section-a2a-server", label: "A0 A2A Server", labelKey: "settings.nav.a0A2a", icon: "conversion_path" },
     ],
   },
   {
     id: "developer",
     label: "Developer",
+    labelKey: "settings.nav.developer",
     icon: "code",
     sections: [
-      { id: "section-dev", label: "Development", icon: "terminal" },
+      { id: "section-dev", label: "Development", labelKey: "settings.nav.development", icon: "terminal" },
     ],
   },
   {
     id: "backup",
     label: "Check for updates",
+    labelKey: "settings.nav.update",
     icon: "system_update_alt",
     sections: [
-      { id: "section-self-update", label: "Self Update", icon: "system_update_alt" },
-      { id: "section-backup-restore", label: "Backup & Restore", icon: "backup" },
+      { id: "section-self-update", label: "Self Update", labelKey: "settings.nav.selfUpdate", icon: "system_update_alt" },
+      { id: "section-backup-restore", label: "Backup & Restore", labelKey: "settings.nav.backupRestore", icon: "backup" },
     ],
   },
 ]);
@@ -106,7 +121,12 @@ const model = {
   _paneScrollHandler: null,
   _paneScrollPane: null,
   _scrollSyncFrame: null,
+  _localeChangeHandler: null,
+  _localizedNavItems: null,
+  _localizedNavLocale: null,
   _updateStatusRefreshedAt: 0,
+  uiLocale: getCurrentLocale(),
+  uiLocalePreference: getLocalePreference(),
   expandedNavGroups: {},
   searchQuery: "",
   
@@ -132,6 +152,7 @@ const model = {
       const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
       if (saved) this._activeTab = this.normalizeTabId(saved);
     } catch {}
+    this.bindUiLocaleRuntime();
     this._activeSection = this.getFirstSectionId(this._activeTab);
     this.expandedNavGroups = this.createDefaultExpandedNavGroups(this._activeTab);
   },
@@ -146,13 +167,14 @@ const model = {
         this.settings = response.settings;
         this.additional = response.additional || null;
         this.applyLocaleRuntime(this.settings);
+        this.scheduleSettingsTranslations();
       } else {
-        throw new Error("Invalid settings response");
+        throw new Error(t("settings.error.invalidResponse", "Invalid settings response"));
       }
     } catch (e) {
       console.error("Failed to load settings:", e);
-      this.error = e.message || "Failed to load settings";
-      toast("Failed to load settings", "error");
+      this.error = e.message || t("settings.error.loadFailed", "Failed to load settings");
+      toast(t("settings.error.loadFailed", "Failed to load settings"), "error");
     } finally {
       this.isLoading = false;
     }
@@ -207,7 +229,13 @@ const model = {
   },
 
   get navItems() {
-    return TAB_ITEMS;
+    const locale = this.uiLocale;
+    if (this._localizedNavItems && this._localizedNavLocale === locale) {
+      return this._localizedNavItems;
+    }
+    this._localizedNavLocale = locale;
+    this._localizedNavItems = TAB_ITEMS.map((item) => this.localizeNavItem(item));
+    return this._localizedNavItems;
   },
 
   get normalizedSearchQuery() {
@@ -220,9 +248,10 @@ const model = {
 
   get filteredNavItems() {
     const query = this.normalizedSearchQuery;
-    if (!query) return TAB_ITEMS;
+    const navItems = this.navItems;
+    if (!query) return navItems;
 
-    return TAB_ITEMS
+    return navItems
       .map((item) => {
         const itemMatches = this.getNavSearchText(item).includes(query);
         const sections = itemMatches
@@ -233,8 +262,12 @@ const model = {
       .filter(Boolean);
   },
 
+  localizeText(value) {
+    return translateStaticText(value);
+  },
+
   get activeTabItem() {
-    return TAB_ITEMS.find((item) => item.id === this.activeTab) || TAB_ITEMS[0];
+    return this.navItems.find((item) => item.id === this.activeTab) || this.navItems[0];
   },
 
   get sectionItems() {
@@ -247,7 +280,47 @@ const model = {
   },
 
   getNavSearchText(item) {
-    return `${item?.label || ""} ${item?.id || ""}`.toLowerCase();
+    return `${item?.label || ""} ${item?.defaultLabel || ""} ${item?.id || ""}`.toLowerCase();
+  },
+
+  localizeNavItem(item) {
+    return {
+      ...item,
+      defaultLabel: item.label,
+      label: t(item.labelKey, item.label),
+      sections: (item.sections || []).map((section) => ({
+        ...section,
+        defaultLabel: section.label,
+        label: t(section.labelKey, section.label),
+      })),
+    };
+  },
+
+  bindUiLocaleRuntime() {
+    if (this._localeChangeHandler) return;
+    this._localeChangeHandler = (event) => {
+      this.uiLocale = event?.detail?.locale || getCurrentLocale();
+      this.uiLocalePreference = event?.detail?.preference || getLocalePreference();
+      this._localizedNavItems = null;
+      this._localizedNavLocale = null;
+      this.scheduleSettingsTranslations();
+    };
+    document.addEventListener("a0:locale-changed", this._localeChangeHandler);
+  },
+
+  scheduleSettingsTranslations() {
+    const root = document.querySelector(".modal-inner.settings-modal") || document;
+    scheduleTranslations(root);
+  },
+
+  get uiLanguageOptions() {
+    return getLocaleOptions();
+  },
+
+  setUiLanguagePreference(value) {
+    setLocalePreference(value);
+    this.uiLocale = getCurrentLocale();
+    this.uiLocalePreference = getLocalePreference();
   },
 
   createDefaultExpandedNavGroups(activeTab = this.activeTab) {
@@ -521,20 +594,20 @@ const model = {
 
   get updateAttentionLabel() {
     const selfUpdate = this.selfUpdate;
-    if (selfUpdate?.info?.pending) return "Scheduled";
-    if (selfUpdate?.quickUpdateAvailable) return "Update available";
-    if (selfUpdate?.hasMajorUpgrade) return "New release line";
-    if (this.hasUpdateNotification) return "Update notice";
-    return selfUpdate?.quickStatusLabel || "Ready";
+    if (selfUpdate?.info?.pending) return this.localizeText("Scheduled");
+    if (selfUpdate?.quickUpdateAvailable) return this.localizeText("Update available");
+    if (selfUpdate?.hasMajorUpgrade) return this.localizeText("New release line");
+    if (this.hasUpdateNotification) return this.localizeText("Update notice");
+    return this.localizeText(selfUpdate?.quickStatusLabel || "Ready");
   },
 
   get updateAttentionTitle() {
     const selfUpdate = this.selfUpdate;
-    if (selfUpdate?.info?.pending) return "Update scheduled";
-    if (selfUpdate?.quickUpdateAvailable) return "Update available";
-    if (selfUpdate?.hasMajorUpgrade) return "New release line available";
-    if (this.hasUpdateNotification) return "Update notice";
-    return "Self Update";
+    if (selfUpdate?.info?.pending) return this.localizeText("Update scheduled");
+    if (selfUpdate?.quickUpdateAvailable) return this.localizeText("Update available");
+    if (selfUpdate?.hasMajorUpgrade) return this.localizeText("New release line available");
+    if (this.hasUpdateNotification) return this.localizeText("Update notice");
+    return this.localizeText("Self Update");
   },
 
   get updateAttentionMessage() {
@@ -544,9 +617,9 @@ const model = {
     }
     const selfUpdate = this.selfUpdate;
     if (selfUpdate?.info?.pending) {
-      return "Agent Zero has a self-update request ready for the next restart.";
+      return this.localizeText("Agent Zero has a self-update request ready for the next restart.");
     }
-    return selfUpdate?.quickStatusMessage || "Review versions, backups, and update readiness in one place.";
+    return this.localizeText(selfUpdate?.quickStatusMessage || "Review versions, backups, and update readiness in one place.");
   },
 
   navItemHasAttention(item) {
@@ -584,7 +657,7 @@ const model = {
   // Save settings
   async saveSettings() {
     if (!this.settings) {
-      toast("No settings to save", "warning");
+      toast(this.localizeText("No settings to save"), "warning");
       return false;
     }
 
@@ -598,7 +671,7 @@ const model = {
         this.settings = response.settings;
         this.additional = response.additional || this.additional;
         this.applyLocaleRuntime(this.settings);
-        toast("Settings saved successfully", "success");
+        toast(this.localizeText("Settings saved successfully"), "success");
         document.dispatchEvent(
           new CustomEvent("settings-updated", { detail: response.settings })
         );
@@ -608,7 +681,7 @@ const model = {
       }
     } catch (e) {
       console.error("Failed to save settings:", e);
-      toast("Failed to save settings: " + e.message, "error");
+      toast(`${this.localizeText("Failed to save settings")}: ${e.message}`, "error");
       return false;
     } finally {
       this.isLoading = false;
@@ -643,7 +716,7 @@ const model = {
       window.openModal("settings/agent/workdir-file-structure-test.html");
     } catch (e) {
       console.error("Error testing workdir file structure:", e);
-      toast("Error testing workdir file structure", "error");
+      toast(this.localizeText("Error testing workdir file structure"), "error");
     }
   },
 

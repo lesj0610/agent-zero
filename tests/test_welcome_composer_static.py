@@ -29,8 +29,8 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "openBlockingSetup()" not in welcome
     assert '.filter((b) => b.id !== "missing-api-key")' in welcome_store
     assert "get heroSubtitle()" in welcome_store
-    assert 'return "How can I help you today?";' in welcome_store
-    assert '<h2>Quick Actions</h2>' in welcome
+    assert 't("welcome.subtitle", "How can I help you today?")' in welcome_store
+    assert 'data-i18n="welcome.quickActions">Quick Actions' in welcome
     assert 'class="welcome-lower-grid"' in welcome
     assert 'x-extension id="welcome-actions-end"' in welcome
     assert "grid-template-columns: repeat(4, minmax(0, 1fr));" in welcome
@@ -46,6 +46,12 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "refreshBanners(true)" in welcome
     assert 'aria-label="Dismiss System Resources"' in welcome
     assert "dismissBanner($store.welcomeStore.systemResourceBanner?.id || 'system-resources')" in welcome
+    assert "x-text=\"$store.welcomeStore.systemResourceTitle\"" in welcome
+    assert "x-html=\"$store.welcomeStore.systemResourceHtml\"" in welcome
+    assert "get systemResourceTitle()" in welcome_store
+    assert "get systemResourceHtml()" in welcome_store
+    assert "localizeSystemResourceHtml(html)" in welcome_store
+    assert "translateStaticText(originalTitle)" in welcome_store
     assert "welcome-panel-status-icon" not in welcome
     assert "monitoring" not in welcome
     assert ".welcome-banner {\n            --welcome-banner-accent: #2f6bff;" in welcome
@@ -67,7 +73,14 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert "dismissFeatureCards()" in discovery_cards
     assert "dismissFeatureCards() {" in discovery_store
     assert 'class="discovery-feature-card"\n                                type="button"' in discovery_cards
-    assert "`${card.cta_text || 'Connect'} ${card.title}`" in discovery_cards
+    assert "$store.discoveryStore.featureCardTitle(card)" in discovery_cards
+    assert "featureCardTitle(card)" in discovery_store
+    assert "$store.discoveryStore.cardTitle(card)" in discovery_cards
+    assert "$store.discoveryStore.cardDescription(card)" in discovery_cards
+    assert "$store.discoveryStore.cardCtaText(card)" in discovery_cards
+    assert "$store.discoveryStore.chipDetail(chip)" in discovery_cards
+    assert "$store.discoveryStore.resetText(window)" in discovery_cards
+    assert "`${card.cta_text || 'Connect'} ${card.title}`" not in discovery_cards
     assert "discovery-feature-card > .btn" not in discovery_cards
     assert "discovery-feature-head" not in discovery_cards
     assert "discovery-account-header" in discovery_cards
@@ -77,7 +90,7 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
 
     assert "x-if=\"$store.welcomeStore && $store.welcomeStore.isVisible\"" in index
     assert "x-if=\"!$store.welcomeStore || !$store.welcomeStore.isVisible\"" in index
-    assert "Connect Channels" in discovery_cards
+    assert 'data-i18n="welcome.connectChannels">Connect Channels' in discovery_cards
     assert "oauthAccountCards" in discovery_cards
     assert "discovery-account-card" in discovery_cards
     assert "topHeroCards" not in discovery_cards
@@ -93,7 +106,7 @@ def test_welcome_composer_can_create_a_chat_before_sending() -> None:
     gate_store = _read("webui/components/chat/model-gate-store.js")
     gate_component = _read("webui/components/chat/model-setup-gate.html")
 
-    assert 'return "Ask anything to start a new chat";' in input_store
+    assert 't("chat.placeholder.start", "Ask anything to start a new chat")' in input_store
     assert "if (!chatsStore.selected" in input_store
     assert "await chatsStore.newChat()" in input_store
     assert "return response.ctxid;" in chats_store

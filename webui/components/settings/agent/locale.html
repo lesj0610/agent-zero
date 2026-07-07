@@ -7,16 +7,37 @@
     <div x-data>
       <template x-if="$store.settings.settings">
         <div>
-          <div class="section-title">Locale</div>
-          <div class="section-description">
+          <div class="section-title" data-i18n="settings.locale.section">Locale</div>
+          <div class="section-description" data-i18n="settings.locale.description">
             Control how dates and times appear across Agent Zero.
           </div>
 
           <div class="field">
             <div class="field-label">
-              <div class="field-title">Timezone</div>
+              <div class="field-title" data-i18n="settings.locale.uiLanguage">UI language</div>
+              <div class="field-description" data-i18n="settings.locale.uiLanguageDescription">
+                This browser's Agent Zero WebUI language.
+              </div>
+            </div>
+            <div class="field-control">
+              <select
+                :value="$store.settings.uiLocalePreference || 'en'"
+                @change="$store.settings.setUiLanguagePreference($event.target.value)"
+                x-effect="$nextTick(() => { $el.value = $store.settings.uiLocalePreference || 'en'; })"
+              >
+                <template x-for="option in $store.settings.uiLanguageOptions" :key="option.value">
+                  <option :value="option.value" x-text="option.label"></option>
+                </template>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">
+              <div class="field-title" data-i18n="settings.locale.timezone">Timezone</div>
               <div class="field-description">
-                Effective timezone: <span x-text="$store.settings.effectiveTimezone"></span>
+                <span data-i18n="settings.locale.effectiveTimezone">Effective timezone:</span>
+                <span x-text="$store.settings.effectiveTimezone"></span>
               </div>
             </div>
             <div class="field-control">
@@ -25,7 +46,7 @@
                 @change="$store.settings.settings.timezone = $event.target.value"
                 x-effect="$nextTick(() => { $el.value = $store.settings.settings.timezone || 'auto'; })"
               >
-                <option value="auto">Automatic (browser)</option>
+                <option value="auto" data-i18n="settings.locale.timezone.auto">Automatic (browser)</option>
                 <template x-for="option in $store.settings.additional?.timezones || []" :key="option.value">
                   <option :value="option.value" x-text="option.label"></option>
                 </template>
@@ -35,8 +56,8 @@
 
           <div class="field">
             <div class="field-label">
-              <div class="field-title">Time format</div>
-              <div class="field-description">
+              <div class="field-title" data-i18n="settings.locale.timeFormat">Time format</div>
+              <div class="field-description" data-i18n="settings.locale.timeFormatDescription">
                 Choose the clock style used for displayed times.
               </div>
             </div>
@@ -46,8 +67,8 @@
                 @change="$store.settings.settings.time_format = $event.target.value"
                 x-effect="$nextTick(() => { $el.value = $store.settings.settings.time_format || '12h'; })"
               >
-                <option value="12h">12-hour (AM/PM)</option>
-                <option value="24h">24-hour</option>
+                <option value="12h" data-i18n="settings.locale.timeFormat.12h">12-hour (AM/PM)</option>
+                <option value="24h" data-i18n="settings.locale.timeFormat.24h">24-hour</option>
               </select>
             </div>
           </div>

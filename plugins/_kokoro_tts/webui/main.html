@@ -9,13 +9,14 @@
 <body>
   <div
     x-data
+    data-i18n-scope="settings"
     x-init="$store.kokoroTts.ensureStatusLoaded()"
     class="speech-plugin-page"
   >
     <template x-if="$store.kokoroTts">
       <div>
-        <div class="section-title">Kokoro TTS</div>
-        <div class="section-description">
+        <div class="section-title" data-i18n="Kokoro TTS">Kokoro TTS</div>
+        <div class="section-description" data-i18n="Built-in Kokoro speech synthesis. Dependency installation remains on the Docker/bootstrap path; disabling this plugin returns spoken output to the browser fallback.">
           Built-in Kokoro speech synthesis. Dependency installation remains on the
           Docker/bootstrap path; disabling this plugin returns spoken output to the
           browser fallback.
@@ -23,37 +24,37 @@
 
         <div class="speech-plugin-grid">
           <div class="speech-plugin-card">
-            <div class="field-title">Provider State</div>
+            <div class="field-title" data-i18n="Provider State">Provider State</div>
             <div class="status-row">
-              <span class="status-key">Enabled</span>
-              <span class="status-badge" :class="$store.kokoroTts.enabled ? 'ok' : 'warn'" x-text="$store.kokoroTts.enabled ? 'Yes' : 'No'"></span>
+              <span class="status-key" data-i18n="Enabled">Enabled</span>
+              <span class="status-badge" :class="$store.kokoroTts.enabled ? 'ok' : 'warn'" x-text="$store.kokoroTts.enabledText"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Model</span>
+              <span class="status-key" data-i18n="Model">Model</span>
               <span class="status-badge" :class="$store.kokoroTts.statusClass" x-text="$store.kokoroTts.statusText"></span>
             </div>
             <div class="status-row" x-show="$store.kokoroTts.packageVersion">
-              <span class="status-key">Package</span>
+              <span class="status-key" data-i18n="Package">Package</span>
               <span class="status-value" x-text="$store.kokoroTts.packageVersion"></span>
             </div>
           </div>
 
           <div class="speech-plugin-card">
-            <div class="field-title">Resolved Config</div>
+            <div class="field-title" data-i18n="Resolved Config">Resolved Config</div>
             <div class="status-row">
-              <span class="status-key">Voice</span>
+              <span class="status-key" data-i18n="Voice">Voice</span>
               <span class="status-value mono" x-text="$store.kokoroTts.config.voice"></span>
             </div>
             <div class="status-row">
-              <span class="status-key">Speed</span>
+              <span class="status-key" data-i18n="Speed">Speed</span>
               <span class="status-value" x-text="$store.kokoroTts.config.speed"></span>
             </div>
           </div>
         </div>
 
         <div class="speech-plugin-actions">
-          <button class="btn btn-field" @click="$store.kokoroTts.openConfig()">Open Settings</button>
-          <button class="btn btn-field" @click="$store.kokoroTts.refreshStatus()">Refresh</button>
+          <button class="btn btn-field" @click="$store.kokoroTts.openConfig()" data-i18n="Open Settings">Open Settings</button>
+          <button class="btn btn-field" @click="$store.kokoroTts.refreshStatus()" data-i18n="Refresh">Refresh</button>
         </div>
       </div>
     </template>
