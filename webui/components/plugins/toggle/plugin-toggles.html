@@ -6,7 +6,7 @@
     </script>
 </head>
 <body>
-    <div x-data>
+    <div x-data data-i18n-scope="settings">
         <template x-if="$store.pluginToggle">
             <div x-create="$store.pluginToggle.loadConfigs()" class="plugin-configs-container">
 
@@ -17,12 +17,12 @@
 
                 <div x-show="$store.pluginToggle.isLoading" class="plugin-configs-loading">
                     <span class="material-symbols-outlined spinning">progress_activity</span>
-                    <span>Loading configurations...</span>
+                    <span data-i18n="Loading configurations...">Loading configurations...</span>
                 </div>
 
                 <div x-show="!$store.pluginToggle.isLoading" class="plugin-configs-list">
                     <template x-if="($store.pluginToggle.configs || []).length === 0">
-                        <div class="plugin-configs-empty">No activation rules found. This plugin is currently using its default ON state.</div>
+                        <div class="plugin-configs-empty" data-i18n="No activation rules found. This plugin is currently using its default ON state.">No activation rules found. This plugin is currently using its default ON state.</div>
                     </template>
 
                     <template x-for="cfg in ($store.pluginToggle.configs || [])" :key="(cfg.project_name || '') + '|' + (cfg.agent_profile || '')">
@@ -30,11 +30,11 @@
                             <div class="plugin-configs-scope">
                                 <div class="plugin-configs-scope-top">
                                     <div class="plugin-configs-scope-line">
-                                        <span class="plugin-configs-scope-key">Project:</span>
+                                        <span class="plugin-configs-scope-key" data-i18n="Project:">Project:</span>
                                         <span x-text="$store.pluginToggle.projectLabel(cfg.project_name || '')"></span>
                                     </div>
                                     <div class="plugin-configs-scope-line">
-                                        <span class="plugin-configs-scope-key">Agent profile:</span>
+                                        <span class="plugin-configs-scope-key" data-i18n="Agent profile:">Agent profile:</span>
                                         <span x-text="$store.pluginToggle.agentProfileLabel(cfg.agent_profile || '')"></span>
                                     </div>
                                 </div>
@@ -48,9 +48,9 @@
                             <div class="plugin-configs-actions">
                                 <button type="button" class="button" @click="$store.pluginToggle.switchToConfig(cfg.project_name || '', cfg.agent_profile || '')">
                                     <span class="icon material-symbols-outlined">edit</span>
-                                    Edit
+                                    <span data-i18n="Edit">Edit</span>
                                 </button>
-                                <button type="button" class="button cancel icon-button" title="Delete" @click="$confirmClick($event, () => $store.pluginToggle.deleteConfig(cfg.path))">
+                                <button type="button" class="button cancel icon-button" title="Delete" data-i18n-title="Delete" @click="$confirmClick($event, () => $store.pluginToggle.deleteConfig(cfg.path))">
                                     <span class="icon material-symbols-outlined">delete</span>
                                 </button>
                             </div>

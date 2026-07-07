@@ -2,9 +2,14 @@ import { createStore } from "/js/AlpineStore.js";
 import * as api from "/js/api.js";
 import { fetchApi } from "/js/api.js";
 import { showConfirmDialog } from "/js/confirmDialog.js";
+import { translateStaticText } from "/js/i18n/index.js";
 import { store as pluginToggleStore } from "/components/plugins/toggle/plugin-toggle-store.js";
 
 const justToast = globalThis.justToast;
+
+function tr(value = "") {
+    return translateStaticText(value);
+}
 
 const model = {
     // which plugin this modal is showing
@@ -43,16 +48,30 @@ const model = {
             this.pluginMeta?.display_name ||
             this.pluginMeta?.name ||
             this.pluginName ||
-            "Plugin"
+            tr("Plugin")
         );
     },
 
     get modalTitle() {
         if (this.openOptions?.title) return this.openOptions.title;
         if (this.openOptions?.focus === "chat" && this.pluginName === "_skills") {
-            return "Skills";
+            return tr("Skills");
         }
-        return `${this.pluginTitle} Settings`;
+        return `${this.pluginTitle} ${tr("Settings")}`;
+    },
+
+    localizeText(value = "") {
+        return tr(value);
+    },
+
+    scopeDescription() {
+        if (this.perProjectConfig && this.perAgentConfig) {
+            return tr("This plugin supports settings per project or agent profile.");
+        }
+        if (this.perProjectConfig) {
+            return tr("This plugin supports settings per project.");
+        }
+        return tr("This plugin supports settings per agent profile.");
     },
 
     get hideSettingsActions() {
@@ -61,7 +80,7 @@ const model = {
 
     confirmDiscardUnsavedChanges() {
         if (!this.hasUnsavedChanges) return true;
-        return window.confirm("You have unsaved changes that will be lost. Continue?");
+        return window.confirm(tr("You have unsaved changes that will be lost. Continue?"));
     },
 
     async _loadPluginMeta(pluginName) {
@@ -137,7 +156,7 @@ const model = {
                 agentProfileKey: this.agentProfileKey || "",
             });
         } catch (e) {
-            this.error = e?.message || "Failed to save activation state";
+            this.error = e?.message || tr("Failed to save activation state");
         }
     },
 
@@ -165,13 +184,13 @@ const model = {
     loadedAgentProfile: "",
 
     projectLabel(key) {
-        if (!key) return "Global";
+        if (!key) return tr("Global");
         const found = (this.projects || []).find((p) => p.key === key);
         return found?.label || key;
     },
 
     agentProfileLabel(key) {
-        if (!key) return "All profiles";
+        if (!key) return tr("All profiles");
         const found = (this.agentProfiles || []).find((p) => p.key === key);
         return found?.label || key;
     },
@@ -185,7 +204,7 @@ const model = {
         if (!this.loadedPath) return "";
         if (selectedProject === loadedProject && selectedProfile === loadedProfile) return "";
 
-        return `Settings do not yet exist for this combination, settings from ${this.projectLabel(loadedProject)}, ${this.agentProfileLabel(loadedProfile)} (${this.loadedPath}) will apply.`;
+        return `${tr("Settings do not yet exist for this combination, settings from")} ${this.projectLabel(loadedProject)}, ${this.agentProfileLabel(loadedProfile)} (${this.loadedPath}) ${tr("will apply.")}`;
     },
 
     configs: [],
@@ -211,9 +230,9 @@ const model = {
             });
             const result = await response.json().catch(() => ({}));
             this.configs = result.ok ? (result.data || []) : [];
-            if (!result.ok) this.configsError = result.error || "Failed to load configurations";
+            if (!result.ok) this.configsError = result.error || tr("Failed to load configurations");
         } catch (e) {
-            this.configsError = e?.message || "Failed to load configurations";
+            this.configsError = e?.message || tr("Failed to load configurations");
             this.configs = [];
         } finally {
             this.isListingConfigs = false;
@@ -237,7 +256,7 @@ const model = {
             );
             const path = cfg?.path || "";
             if (!path) {
-                this.configsError = "Configuration path not found";
+                this.configsError = tr("Configuration path not found");
                 return;
             }
 
@@ -252,14 +271,14 @@ const model = {
             });
             const result = await response.json().catch(() => ({}));
             if (!result.ok) {
-                this.configsError = result.error || "Delete failed";
+                this.configsError = result.error || tr("Delete failed");
                 return;
             }
 
             this.configsError = null;
             await this.loadConfigList();
         } catch (e) {
-            this.configsError = e?.message || "Delete failed";
+            this.configsError = e?.message || tr("Delete failed");
         }
     },
 
@@ -272,16 +291,16 @@ const model = {
 
     async openConfig(pluginName, projectName = "", agentProfile = "", openOptions = {}) {
         if (!pluginName) {
-            throw new Error("Missing plugin name.");
+            throw new Error(tr("Missing plugin name."));
         }
 
         this.cleanup();
         const pluginMeta = await this._loadPluginMeta(pluginName);
         if (!pluginMeta) {
-            throw new Error(`Plugin "${pluginName}" not found.`);
+            throw new Error(`${tr("Plugin")} "${pluginName}" ${tr("not found.")}`);
         }
         if (!pluginMeta.has_config_screen) {
-            throw new Error(`Plugin "${pluginName}" has no config screen.`);
+            throw new Error(`${tr("Plugin")} "${pluginName}" ${tr("has no config screen.")}`);
         }
 
         await Promise.all([this.loadProjects(), this.loadAgentProfiles()]);
@@ -290,7 +309,7 @@ const model = {
         await this.loadSettings();
 
         if (!pluginToggleStore?.open) {
-            throw new Error("Plugin toggle store is unavailable.");
+            throw new Error(tr("Plugin toggle store is unavailable."));
         }
         await pluginToggleStore.open(pluginMeta, resolvedScope);
         await window.openModal?.("/components/plugins/plugin-settings.html");
@@ -344,9 +363,9 @@ const model = {
             this.loadedPath = result.loaded_path || "";
             this.loadedProjectName = result.loaded_project_name || "";
             this.loadedAgentProfile = result.loaded_agent_profile || "";
-            if (!result.ok) this.error = result.error || "Failed to load settings";
+            if (!result.ok) this.error = result.error || tr("Failed to load settings");
         } catch (e) {
-            this.error = e?.message || "Failed to load settings";
+            this.error = e?.message || tr("Failed to load settings");
             this.settings = {};
         } finally {
             this.settingsSnapshotJson = this._toComparableJson(this.settings);
@@ -359,9 +378,9 @@ const model = {
     async resetToDefault() {
         if (!this.pluginName) return;
         const confirmed = await showConfirmDialog({
-            title: "Reset to Default",
-            message: "This will replace the current settings with the plugin defaults. Any unsaved changes will be lost.",
-            confirmText: "Reset",
+            title: tr("Reset to Default"),
+            message: tr("This will replace the current settings with the plugin defaults. Any unsaved changes will be lost."),
+            confirmText: tr("Reset"),
             type: "warning",
         });
         if (!confirmed) return;
@@ -373,7 +392,7 @@ const model = {
         const result = await response.json().catch(() => ({}));
         if (result.ok) {
             this.settings = result.data || {};
-            justToast("Settings reset to default.", "info");
+            justToast(tr("Settings reset to default."), "info");
         }
     },
 
@@ -394,13 +413,13 @@ const model = {
                 }),
             });
             const result = await response.json().catch(() => ({}));
-            if (!result.ok) this.error = result.error || "Save failed";
+            if (!result.ok) this.error = result.error || tr("Save failed");
             else {
                 this.settingsSnapshotJson = this._toComparableJson(this.settings);
                 window.closeModal?.();
             }
         } catch (e) {
-            this.error = e?.message || "Save failed";
+            this.error = e?.message || tr("Save failed");
         } finally {
             this.isSaving = false;
         }

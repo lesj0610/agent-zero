@@ -128,8 +128,13 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     model_summary = _read("plugins/_model_config/webui/models-summary.html")
     model_switcher = _read("plugins/_model_config/extensions/webui/chat-input-progress-start/model-switcher.html")
     switcher_store = _read("plugins/_model_config/webui/switcher-mixin.js")
+    plugin_settings = _read("webui/components/plugins/plugin-settings.html")
+    plugin_settings_store = _read("webui/components/plugins/plugin-settings-store.js")
+    plugin_configs = _read("webui/components/plugins/plugin-configs.html")
+    plugin_toggles = _read("webui/components/plugins/toggle/plugin-toggles.html")
     agent_settings = _read("webui/components/settings/agent/agent-settings.html")
     agent_config = _read("webui/components/settings/agent/agent.html")
+    agent_workdir = _read("webui/components/settings/agent/workdir.html")
     agent_voice = _read("webui/components/settings/agent/voice.html")
     email_store = _read("plugins/_email_integration/webui/email-config-store.js")
     email_config = _read("plugins/_email_integration/webui/config.html")
@@ -166,9 +171,25 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'return preset?.name || tr("Unnamed")' in switcher_store
     assert 'if (!o) return tr("Default LLM")' in switcher_store
     assert '|| tr("Custom")' in switcher_store
+    assert 'x-effect="context.settingsComponentHtml; $nextTick(() => globalThis.A0_I18N?.scheduleTranslations?.($el))"' in plugin_settings
+    assert 'data-i18n="Settings scope"' in plugin_settings
+    assert 'data-i18n="All profiles"' in plugin_settings
+    assert 'data-i18n-title="Show existing configurations"' in plugin_settings
+    assert 'import { translateStaticText } from "/js/i18n/index.js";' in plugin_settings_store
+    assert "scopeDescription()" in plugin_settings_store
+    assert 'tr("This plugin supports settings per project or agent profile.")' in plugin_settings_store
+    assert "localizeText(value = \"\")" in plugin_settings_store
+    assert 'data-i18n-scope="settings"' in plugin_configs
+    assert 'data-i18n="Loading configurations..."' in plugin_configs
+    assert 'data-i18n="No configurations found."' in plugin_configs
+    assert 'data-i18n-scope="settings"' in plugin_toggles
+    assert 'data-i18n="No activation rules found. This plugin is currently using its default ON state."' in plugin_toggles
     assert 'data-i18n-scope="settings"' in model_config
     assert "$store.modelConfig.getModelSections()" in model_config
     assert 'data-i18n-scope="settings"' in model_field
+    assert 'data-i18n="Supports Vision"' in model_field
+    assert 'data-i18n="Provider"' in model_field
+    assert 'data-i18n="Context window size"' in model_field
     assert 'data-i18n-scope="settings"' in model_presets
     assert "$store.modelConfig.presetDisplayName(preset)" in model_presets
     assert "$store.modelConfig.defaultPresetName(idx + 1)" in model_presets
@@ -177,7 +198,11 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'data-i18n-scope="settings"' in model_summary
     assert 'data-i18n-scope="settings"' in model_switcher
     assert 'data-i18n-scope="settings"' in agent_settings
+    assert 'data-i18n="Agent Config"' in agent_settings
     assert 'data-i18n-scope="settings"' in agent_config
+    assert 'data-i18n="Default agent profile"' in agent_config
+    assert 'data-i18n-scope="settings"' in agent_workdir
+    assert 'data-i18n="Workdir path"' in agent_workdir
     assert 'data-i18n-scope="settings"' in agent_voice
     assert 'data-i18n-scope="settings"' in email_config
     assert 'data-i18n-placeholder="email.placeholder.routing"' in email_config
@@ -206,10 +231,21 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"System default": "시스템 기본값"' in ko_js
     assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
     assert '"Provider State": "제공자 상태"' in ko_js
+    assert '"Settings scope": "설정 범위"' in ko_js
+    assert '"This plugin supports settings per project or agent profile.":' in ko_js
+    assert '"All profiles": "모든 프로필"' in ko_js
+    assert '"Show existing configurations": "기존 구성 보기"' in ko_js
+    assert '"Loading configurations...": "구성 목록 불러오는 중..."' in ko_js
+    assert '"No configurations found.": "구성이 없습니다."' in ko_js
+    assert '"No activation rules found. This plugin is currently using its default ON state.":' in ko_js
+    assert '"Project:": "프로젝트:"' in ko_js
+    assert '"Agent profile:": "Agent 프로필:"' in ko_js
+    assert '"Show": "보기"' in ko_js
     assert '"Main Model": "메인 모델"' in ko_js
     assert '"Utility Model": "유틸리티 모델"' in ko_js
     assert '"Embedding Model": "임베딩 모델"' in ko_js
     assert '"Model name": "모델 이름"' in ko_js
+    assert '"Supports Vision": "Vision 지원"' in ko_js
     assert '"Per-Chat Override": "채팅별 재정의"' in ko_js
     assert '"Default LLM": "기본 LLM"' in ko_js
     assert '"Use Default": "기본값 사용"' in ko_js

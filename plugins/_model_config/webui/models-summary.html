@@ -12,16 +12,16 @@
   <div x-data data-i18n-scope="settings">
     <template x-if="$store.modelConfig">
       <div>
-        <div class="section-title">Model Configuration</div>
-        <div class="section-description">
+        <div class="section-title" data-i18n="Model Configuration">Model Configuration</div>
+        <div class="section-description" data-i18n="AI models can be configured globally, per project, per agent and using quick-switch presets as well.">
           AI models can be configured globally, per project, per agent and using quick-switch presets as well.
         </div>
 
         <!-- Read-only model config summary -->
         <div x-init="$store.modelConfig.refreshModelsSummary()" class="model-summary">
           <div class="model-summary-header">
-            <div class="field-title">Current Models</div>
-            <div class="field-description">Active model configuration resolved from global, project, and agent profile
+            <div class="field-title" data-i18n="Current Models">Current Models</div>
+            <div class="field-description" data-i18n="Active model configuration resolved from global, project, and agent profile scopes.">Active model configuration resolved from global, project, and agent profile
               scopes.</div>
           </div>
           <div x-show="$store.modelConfig.modelsSummaryLoading" style="text-align:center; padding:12px;">
@@ -46,13 +46,13 @@
 
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
           <button class="btn btn-field" @click="$store.modelConfig.openConfigFromSummary()">
-            Configure Models
+            <span data-i18n="Configure Models">Configure Models</span>
           </button>
           <button class="btn btn-field" @click="$store.modelConfig.openPresetsFromSummary()">
-            Configure Presets
+            <span data-i18n="Configure Presets">Configure Presets</span>
           </button>
           <button class="btn btn-field" @click="$store.modelConfig.openApiKeysFromSummary()">
-            Configure API Keys
+            <span data-i18n="Configure API Keys">Configure API Keys</span>
           </button>
         </div>
 

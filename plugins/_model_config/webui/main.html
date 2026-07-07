@@ -18,8 +18,8 @@
     <template x-if="$store.modelConfig._loaded && $store.modelConfig._presetsLoaded">
       <div class="presets-page" x-data="{ presets: JSON.parse(JSON.stringify($store.modelConfig.globalPresets)) }">
         <div class="presets-header">
-          <div class="field-title" style="font-size:1rem;">Model Presets</div>
-          <div class="field-description">Global presets shared across all projects and agents. Used by the model switcher in the chat area.</div>
+          <div class="field-title" style="font-size:1rem;" data-i18n="Model Presets">Model Presets</div>
+          <div class="field-description" data-i18n="Global presets shared across all projects and agents. Used by the model switcher in the chat area.">Global presets shared across all projects and agents. Used by the model switcher in the chat area.</div>
         </div>
 
         <template x-for="(preset, idx) in presets" :key="idx">
@@ -33,7 +33,8 @@
                     x-text="(preset.chat?.provider ? preset.chat.provider + '/' : '') + (preset.chat?.name || '')"></span>
               <button class="text-button preset-delete-btn"
                       @click.stop="$confirmClick($event, () => { presets.splice(idx, 1); presets = [...presets]; })"
-                      title="Remove preset">
+                      title="Remove preset"
+                      data-i18n-title="Remove preset">
                 <span class="material-symbols-outlined" style="font-size:16px;">close</span>
               </button>
             </div>
@@ -41,19 +42,19 @@
             <div class="preset-card-body" x-show="expanded" x-transition.opacity>
               <div class="field">
                 <div class="field-label">
-                  <div class="field-title">Preset name</div>
-                  <div class="field-description">Display name shown in the model switcher dropdown.</div>
+                  <div class="field-title" data-i18n="Preset name">Preset name</div>
+                  <div class="field-description" data-i18n="Display name shown in the model switcher dropdown.">Display name shown in the model switcher dropdown.</div>
                 </div>
-                <div class="field-control"><input type="text" x-model="preset.name" placeholder="e.g. GPT-4o, Claude Sonnet"
+                <div class="field-control"><input type="text" x-model="preset.name" placeholder="e.g. GPT-4o, Claude Sonnet" data-i18n-placeholder="e.g. GPT-4o, Claude Sonnet"
                      @blur="if (!preset.name.trim()) preset.name = $store.modelConfig.defaultPresetName(idx + 1)" required /></div>
               </div>
 
-              <div class="preset-subheader">Main Model</div>
+              <div class="preset-subheader" data-i18n="Main Model">Main Model</div>
               <div x-data="{ model: preset.chat, modelType: 'chat', providers: $store.modelConfig.chatProviders, searchType: 'chat', apiKeyMode: 'store' }">
                 <x-component path="/plugins/_model_config/webui/model-field.html"></x-component>
               </div>
 
-              <div class="preset-subheader">Utility Model <span style="opacity:0.5; font-size:0.75rem;">(optional &#x2014; falls back to the configured Utility Model)</span></div>
+              <div class="preset-subheader"><span data-i18n="Utility Model">Utility Model</span> <span style="opacity:0.5; font-size:0.75rem;" data-i18n="(optional — falls back to the configured Utility Model)">(optional &#x2014; falls back to the configured Utility Model)</span></div>
               <div x-data="{ model: preset.utility, modelType: 'utility', providers: $store.modelConfig.chatProviders, searchType: 'chat', apiKeyMode: 'store', providerFallback: preset.chat.provider, apiBaseFallback: preset.chat.api_base }">
                 <x-component path="/plugins/_model_config/webui/model-field.html"></x-component>
               </div>
@@ -70,24 +71,24 @@
                       utility: { provider: '', name: '', api_key: '', api_base: '', kwargs: {}, _kwargs_text: '' }
                     }]">
             <span class="material-symbols-outlined">add</span>
-            <span>Add Preset</span>
+            <span data-i18n="Add Preset">Add Preset</span>
           </button>
           <button class="text-button" @click="(async () => {
             await import('/components/plugins/plugin-settings-store.js');
             await $store.pluginSettingsPrototype.openConfig('_model_config');
           })()">
             <span class="material-symbols-outlined">settings</span>
-            <span>Settings</span>
+            <span data-i18n="Settings">Settings</span>
           </button>
           <button class="text-button" @click="openModal('/plugins/_model_config/webui/api-keys.html')">
             <span class="material-symbols-outlined">key</span>
-            <span>API Keys</span>
+            <span data-i18n="API Keys">API Keys</span>
           </button>
         </div>
 
         <div class="presets-footer">
           <button class="button" @click="(async () => { await $store.modelConfig.persistAllDirtyApiKeys(); await $store.modelConfig.saveGlobalPresets(presets); })()">
-            <span class="icon material-symbols-outlined">save</span> Save Presets
+            <span class="icon material-symbols-outlined">save</span> <span data-i18n="Save Presets">Save Presets</span>
           </button>
         </div>
       </div>
