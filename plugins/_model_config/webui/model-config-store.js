@@ -471,7 +471,9 @@ export const store = createStore("modelConfig", {
 
   async openConfigFromSummary() {
     try {
-      await pluginSettingsStore.openConfig('_model_config');
+      await pluginSettingsStore.openConfig('_model_config', '', '', {
+        title: translateStaticText('Model Configuration'),
+      });
     } finally {
       await this.refreshModelsSummary();
     }

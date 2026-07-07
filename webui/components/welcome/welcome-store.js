@@ -150,11 +150,13 @@ const model = {
   },
 
   get sortedBanners() {
+    this.uiLocale;
     return [...this.banners]
       .filter((b) => b.id !== "system-resources")
       .filter((b) => b.id !== "missing-api-key")
       .filter((b) => b.type !== "hero" && b.type !== "feature")
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      .map((banner) => this.localizeBanner(banner));
   },
 
   get systemResourceBanner() {
@@ -209,6 +211,44 @@ const model = {
       }
     }
 
+    return template.innerHTML;
+  },
+
+  localizeBanner(banner) {
+    return {
+      ...banner,
+      title: translateStaticText(banner?.title || ""),
+      html: this.localizeBannerHtml(banner?.html || ""),
+      cta_text: translateStaticText(banner?.cta_text || ""),
+    };
+  },
+
+  localizeBannerHtml(html) {
+    if (!html || typeof document === "undefined") return html || "";
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    const walker = document.createTreeWalker(
+      template.content,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent || parent.closest("script, style, code, pre")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return node.nodeValue?.trim()
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      },
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      node.nodeValue = translateStaticText(node.nodeValue || "");
+    }
     return template.innerHTML;
   },
 

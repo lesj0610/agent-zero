@@ -77,6 +77,8 @@ def test_settings_locale_section_exposes_ui_language_choice() -> None:
     assert "bindUiLocaleRuntime()" in store
     assert "scheduleSettingsTranslations()" in store
     assert "scheduleTranslations(root);" in store
+    assert "window.requestAnimationFrame(retry)" in store
+    assert "window.setTimeout(retry, 50)" in store
     assert "getLocalePreference()" in store
     assert "getLocaleOptions()" in store
     assert 'data-i18n="settings.locale.uiLanguage"' in locale
@@ -156,6 +158,9 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert 'pieces.push(`${tr("Project")}: ${handler.project}`)' in email_store
     assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in welcome_store
     assert "localizeSystemResourceHtml(html)" in welcome_store
+    assert "localizeBanner(banner)" in welcome_store
+    assert "localizeBannerHtml(html)" in welcome_store
+    assert ".map((banner) => this.localizeBanner(banner))" in welcome_store
     assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in discovery_store
     assert "featureCardTitle(card)" in discovery_store
     assert '"LiteLLM Global Settings": "LiteLLM 전역 설정"' in ko_js
@@ -181,4 +186,50 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"Request Mic Permission": "마이크 권한 요청"' in ko_js
     assert '"Your AI accounts": "AI 계정"' in ko_js
     assert '"System Resources": "시스템 리소스"' in ko_js
+    assert '"Unsecured Connection": "보호되지 않은 연결"' in ko_js
+    assert '"Configure credentials": "자격 증명 구성"' in ko_js
+    assert '"Use your subscription-backed logins for model access.": "구독 기반 로그인으로 모델에 접근합니다."' in ko_js
     assert '"welcome.connectChannels": "채널 연결"' in ko_js
+
+
+def test_model_config_summary_routes_keep_their_modal_contracts() -> None:
+    model_config_store = _read("plugins/_model_config/webui/model-config-store.js")
+    model_config_html = _read("plugins/_model_config/webui/config.html")
+    i18n_js = _read("webui/js/i18n/index.js")
+
+    assert "pluginSettingsStore.openConfig('_model_config', '', '', {" in model_config_store
+    assert "title: translateStaticText('Model Configuration')" in model_config_store
+    assert "pluginSettingsStore.openConfig('_model_config');" not in model_config_store
+    assert "installSettingsHooks(context)" in model_config_html
+    assert "await window.openModal?.('/plugins/_model_config/webui/main.html')" in model_config_store
+    assert "await window.openModal?.('/plugins/_model_config/webui/api-keys.html')" in model_config_store
+    assert 'const STATIC_ATTRIBUTE_NAMES = ["title", "aria-label", "placeholder", "data-placeholder"];' in i18n_js
+    assert "data-banner-action" not in i18n_js
+    assert "href" not in i18n_js
+
+
+def test_oauth_settings_dynamic_surfaces_are_localized() -> None:
+    config_html = _read("plugins/_oauth/webui/config.html")
+    oauth_store = _read("plugins/_oauth/webui/oauth-config-store.js")
+    ko_js = _read("webui/js/i18n/locales/ko.js")
+
+    assert 'import { getCurrentLocale, t, translateStaticText } from "/js/i18n/index.js";' in oauth_store
+    assert "bindUiLocaleRuntime()" in oauth_store
+    assert "localizeText(value = \"\")" in oauth_store
+    assert "get modelSlots()" in oauth_store
+    assert "providerConnectionStateLabel(connected)" in oauth_store
+    assert "providerDisconnectLabel(providerId)" in oauth_store
+    assert "modelInputPlaceholder(key)" in oauth_store
+    assert 't("oauth.percentLeft"' in oauth_store
+    assert 't("oauth.resetsIn"' in oauth_store
+    assert 't("oauth.availableModelsFrom"' in oauth_store
+    assert 't("oauth.currentlyProvider"' in oauth_store
+    assert 'data-i18n-scope="settings"' in config_html
+    assert "$store.oauthConfig.providerConnectionStateLabel(card.connected)" in config_html
+    assert "$store.oauthConfig.providerDisconnectLabel(card.provider_id)" in config_html
+    assert "$store.oauthConfig.modelInputPlaceholder(slot.key)" in config_html
+    assert "$store.oauthConfig.formatResetLabel(window)" in config_html
+    assert "$store.oauthConfig.localizeText('No models found. You can still type the model name manually.')" in config_html
+    assert '"oauth.percentLeft": "{percent}% 남음"' in ko_js
+    assert '"Ready to connect": "연결 준비됨"' in ko_js
+    assert '"Check models": "모델 확인"' in ko_js
