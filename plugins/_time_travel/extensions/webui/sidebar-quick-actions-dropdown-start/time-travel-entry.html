@@ -5,8 +5,9 @@
     class="dropdown-item"
     id="time-travel-dropdown"
     title="Time Travel"
+    data-i18n-title="Time Travel"
     @click="$store.timeTravel?.onOpen?.(); ensureModalOpen('/plugins/_time_travel/webui/main.html'); $store.sidebar.menuClose()">
     <span class="material-symbols-outlined">history</span>
-    <span>Time Travel</span>
+    <span data-i18n="Time Travel">Time Travel</span>
   </button>
 </div>

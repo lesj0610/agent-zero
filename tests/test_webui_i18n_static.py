@@ -122,6 +122,8 @@ def test_common_webui_surfaces_have_i18n_keys_with_english_fallbacks() -> None:
         "discovery": _read("plugins/_discovery/extensions/webui/welcome-actions-end/discovery-cards.html"),
         "chat_input": _read("webui/components/chat/input/chat-bar-input.html"),
         "sidebar": _read("webui/components/sidebar/top-section/header-icons.html"),
+        "memory_dropdown": _read("plugins/_memory/extensions/webui/sidebar-quick-actions-dropdown-start/memory-entry.html"),
+        "time_travel_dropdown": _read("plugins/_time_travel/extensions/webui/sidebar-quick-actions-dropdown-start/time-travel-entry.html"),
         "preferences": _read("webui/components/sidebar/bottom/preferences/preferences-panel.html"),
     }
 
@@ -131,6 +133,11 @@ def test_common_webui_surfaces_have_i18n_keys_with_english_fallbacks() -> None:
     assert 'data-i18n="welcome.connectChannels">Connect Channels' in surfaces["discovery"]
     assert 'data-i18n-aria-label="chat.moreActions"' in surfaces["chat_input"]
     assert 'data-i18n="sidebar.navigation">Navigation' in surfaces["sidebar"]
+    assert 'data-i18n="sidebar.spaceAgent">Space Agent' in surfaces["sidebar"]
+    assert 'data-i18n="Memory">Memory' in surfaces["memory_dropdown"]
+    assert 'data-i18n-title="Memory"' in surfaces["memory_dropdown"]
+    assert 'data-i18n="Time Travel">Time Travel' in surfaces["time_travel_dropdown"]
+    assert 'data-i18n-title="Time Travel"' in surfaces["time_travel_dropdown"]
     assert 'data-i18n="preferences.title">Preferences' in surfaces["preferences"]
 
 
@@ -277,6 +284,8 @@ def test_settings_dynamic_surfaces_use_i18n_helpers() -> None:
     assert '"Draft in composer": "작성창에 초안으로 넣기"' in ko_js
     assert '"Main": "메인"' in ko_js
     assert '"Memory": "메모리"' in ko_js
+    assert '"Time Travel": "타임 트래블"' in ko_js
+    assert '"sidebar.spaceAgent": "스페이스 에이전트"' in ko_js
     assert '"Manages LLM model selection and configuration for chat, utility, and embedding models. Supports per-project and per-agent overrides with optional per-chat model switching.":' in ko_js
     assert '"System default": "시스템 기본값"' in ko_js
     assert '"Whisper STT disabled": "Whisper STT 비활성화됨"' in ko_js
